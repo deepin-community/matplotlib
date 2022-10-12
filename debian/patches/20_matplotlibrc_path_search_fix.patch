@@ -1,0 +1,31 @@
+From: Sandro Tosi <morph@debian.org>
+Date: Thu, 8 Oct 2015 09:47:11 -0700
+Subject: Fixes the path to search for matplotlibrc file
+
+Forwarded: not-needed
+
+Patch-Name: 20_matplotlibrc_path_search_fix.patch
+---
+ lib/matplotlib/__init__.py | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+--- a/lib/matplotlib/__init__.py
++++ b/lib/matplotlib/__init__.py
+@@ -540,6 +540,8 @@ def _get_data_path():
+     if path.is_dir():
+         return str(path)
+ 
++    return '/usr/share/matplotlib/mpl-data'
++
+     cbook.warn_deprecated(
+         "3.2", message="Matplotlib installs where the data is not in the "
+         "mpl-data subdirectory of the package are deprecated since %(since)s "
+@@ -597,7 +599,7 @@ def matplotlib_fname():
+             yield matplotlibrc
+             yield os.path.join(matplotlibrc, 'matplotlibrc')
+         yield os.path.join(get_configdir(), 'matplotlibrc')
+-        yield os.path.join(_get_data_path(), 'matplotlibrc')
++        yield '/etc/matplotlibrc'
+ 
+     for fname in gen_candidates():
+         if os.path.exists(fname) and not os.path.isdir(fname):

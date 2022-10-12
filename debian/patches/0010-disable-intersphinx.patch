@@ -1,0 +1,26 @@
+From: Sandro Tosi <morph@debian.org>
+Date: Wed, 17 Jan 2018 20:20:58 -0500
+Subject: disable intersphinx
+
+---
+ doc/conf.py | 4 ----
+ 1 file changed, 4 deletions(-)
+
+--- a/doc/conf.py
++++ b/doc/conf.py
+@@ -118,15 +118,6 @@ missing_references_write_json = False
+ missing_references_warn_unused_ignores = False
+ 
+ intersphinx_mapping = {
+-    'Pillow': ('https://pillow.readthedocs.io/en/stable/', None),
+-    'cycler': ('https://matplotlib.org/cycler/', None),
+-    'dateutil': ('https://dateutil.readthedocs.io/en/stable/', None),
+-    'ipykernel': ('https://ipykernel.readthedocs.io/en/latest/', None),
+-    'numpy': ('https://numpy.org/doc/stable/', None),
+-    'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
+-    'pytest': ('https://pytest.org/en/stable/', None),
+-    'python': ('https://docs.python.org/3/', None),
+-    'scipy': ('https://docs.scipy.org/doc/scipy/reference/', None),
+ }
+ 
+ 
