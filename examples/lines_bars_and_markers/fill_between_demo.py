@@ -114,7 +114,7 @@ fig.tight_layout()
 # ------------------------------------------------------------
 # The same selection mechanism can be applied to fill the full vertical height
 # of the axes. To be independent of y-limits, we add a transform that
-# interprets the x-values in data coorindates and the y-values in axes
+# interprets the x-values in data coordinates and the y-values in axes
 # coordinates.
 #
 # The following example marks the regions in which the y-data are above a
@@ -132,15 +132,10 @@ ax.fill_between(x, 0, 1, where=y > threshold,
 
 #############################################################################
 #
-# ------------
+# .. admonition:: References
 #
-# References
-# """"""""""
+#    The use of the following functions, methods, classes and modules is shown
+#    in this example:
 #
-# The use of the following functions, methods and classes is shown
-# in this example:
-
-import matplotlib
-matplotlib.axes.Axes.fill_between
-matplotlib.pyplot.fill_between
-matplotlib.axes.Axes.get_xaxis_transform
+#    - `matplotlib.axes.Axes.fill_between` / `matplotlib.pyplot.fill_between`
+#    - `matplotlib.axes.Axes.get_xaxis_transform`

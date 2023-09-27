@@ -1,9 +1,17 @@
 """
-=============
-Keypress Demo
-=============
+==============
+Keypress event
+==============
 
-Show how to connect to keypress events
+Show how to connect to keypress events.
+
+.. note::
+    This example exercises the interactive capabilities of Matplotlib, and this
+    will not appear in the static documentation. Please run this code on your
+    machine to see the interactivity.
+
+    You can copy and paste individual parts, or download the entire example
+    using the link at the bottom of the page.
 """
 import sys
 import numpy as np
@@ -18,9 +26,9 @@ def on_press(event):
         xl.set_visible(not visible)
         fig.canvas.draw()
 
+
 # Fixing random state for reproducibility
 np.random.seed(19680801)
-
 
 fig, ax = plt.subplots()
 

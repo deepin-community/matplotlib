@@ -41,7 +41,7 @@ fig.subplots_adjust(hspace=0.3)
 axs = _axs.flatten()
 
 cset1 = axs[0].contourf(X, Y, Z, levels, norm=norm,
-                        cmap=cm.get_cmap(cmap, len(levels) - 1))
+                        cmap=cmap.resampled(len(levels) - 1))
 # It is not necessary, but for the colormap, we need only the
 # number of levels minus 1.  To avoid discretization error, use
 # either this number or a large number such as the default (256).
@@ -97,19 +97,12 @@ plt.show()
 
 #############################################################################
 #
-# ------------
+# .. admonition:: References
 #
-# References
-# """"""""""
+#    The use of the following functions, methods, classes and modules is shown
+#    in this example:
 #
-# The use of the following functions, methods and classes is shown
-# in this example:
-
-import matplotlib
-matplotlib.axes.Axes.contour
-matplotlib.pyplot.contour
-matplotlib.axes.Axes.imshow
-matplotlib.pyplot.imshow
-matplotlib.figure.Figure.colorbar
-matplotlib.pyplot.colorbar
-matplotlib.colors.Normalize
+#    - `matplotlib.axes.Axes.contour` / `matplotlib.pyplot.contour`
+#    - `matplotlib.axes.Axes.imshow` / `matplotlib.pyplot.imshow`
+#    - `matplotlib.figure.Figure.colorbar` / `matplotlib.pyplot.colorbar`
+#    - `matplotlib.colors.Normalize`
