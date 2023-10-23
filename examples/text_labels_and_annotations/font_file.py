@@ -12,7 +12,7 @@ Here, we use the Computer Modern roman font (``cmr10``) shipped with
 Matplotlib.
 
 For a more flexible solution, see
-:doc:`/gallery/text_labels_and_annotations/font_family_rc_sgskip` and
+:doc:`/gallery/text_labels_and_annotations/font_family_rc` and
 :doc:`/gallery/text_labels_and_annotations/fonts_demo`.
 """
 
@@ -32,13 +32,9 @@ plt.show()
 
 #############################################################################
 #
-# ------------
+# .. admonition:: References
 #
-# References
-# """"""""""
+#    The use of the following functions, methods, classes and modules is shown
+#    in this example:
 #
-# The use of the following functions, methods, classes and modules is shown
-# in this example:
-
-import matplotlib
-matplotlib.axes.Axes.set_title
+#    - `matplotlib.axes.Axes.set_title`

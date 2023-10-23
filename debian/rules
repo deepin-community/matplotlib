@@ -5,24 +5,28 @@ export XDG_RUNTIME_DIR=/tmp
 PY3VERS := $(shell py3versions -v -r debian/control)
 DEFPY3 := $(shell py3versions -v -d)
 PY_PLATFORM := $(shell python3 -c 'from distutils.util import get_platform; print(get_platform())')
-pd := python-matplotlib-doc
 p3 := python3-matplotlib
 pdata := python-matplotlib-data
 DEB_BUILD_OPTIONS += --no-parallel
 
 export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+
+# https://bugs.debian.org/1000435
+# it is due to a bug of gcc-11
+ifneq (,$(filter $(DEB_HOST_ARCH), mips64 mips64el mips64r6 mips64r6el))
+  DEB_CFLAGS_MAINT_APPEND += -O3
+  DEB_CXXFLAGS_MAINT_APPEND += -O3
+endif
+
 DPKG_EXPORT_BUILDFLAGS = 1
 include /usr/share/dpkg/buildflags.mk
 
 # build
-build: build-arch
+build: build-arch build-indep
 
 build-indep: build-indep-stamp
 build-indep-stamp: build-arch-stamp
 	dh_testdir
-
-	# build the doc
-	# MPLCONFIGDIR=. MATPLOTLIBDATA=$(CURDIR)/lib/matplotlib/mpl-data/ PYTHONPATH=$(CURDIR)/build/lib.$(PY_PLATFORM)-$(DEFPY3) xvfb-run -a $(MAKE) -C doc html
 
 	touch $@
 
@@ -30,7 +34,7 @@ build-arch: build-arch-stamp
 build-arch-stamp:
 	dh_testdir
 
-	cp -f debian/setup.cfg setup.cfg
+	cp -f debian/mplsetup.cfg mplsetup.cfg
 
 	set -e; \
 	for v in $(PY3VERS); do \
@@ -39,10 +43,10 @@ build-arch-stamp:
 
 ifeq (,$(findstring nocheck,$(DEB_BUILD_OPTIONS)))
 	echo "backend      : TkAgg" > matplotlibrc
-
+	# all the "not" tests are due to https://github.com/matplotlib/matplotlib/issues/24770
 	-for v in $(PY3VERS); do \
 		LIB=$$(python$$v -c "from distutils.command.build import build ; from distutils.core import Distribution ; b = build(Distribution()) ; b.finalize_options() ; print(b.build_platlib)") ; \
-		PYTHONPATH=$$LIB MATPLOTLIBDATA=$(CURDIR)/lib/matplotlib/mpl-data/ MPLCONFIGDIR=. xvfb-run -a python$$v tests.py --verbose --full-trace ; \
+		PYTHONPATH=$$LIB MATPLOTLIBDATA=$(CURDIR)/lib/matplotlib/mpl-data/ MPLCONFIGDIR=. xvfb-run -a python$$v -m pytest --verbose --full-trace $$LIB/matplotlib/tests/ --ignore-glob=*/test_backend_nbagg.py -k 'not test_fig_close and not test_fig_sigint_override and not test_correct_key and not test_device_pixel_ratio_change and not test_subplottool and not test_figureoptions and not test_double_resize and not test_canvas_reinit and not test_form_widget_get_with_datetime_and_date_fields and not test_span_selector_animated_artists_callback';  \
 	done
 	rm -f matplotlibrc
 endif
@@ -74,8 +78,8 @@ clean:
 
 	find . -name '*.pyc' -exec rm {} \;
 
-	dh_clean lib/matplotlib/mpl-data/matplotlib.conf \
-		lib/matplotlib/mpl-data/matplotlibrc setup.cfg
+	#dh_clean lib/matplotlib/mpl-data/matplotlib.conf \
+	#	lib/matplotlib/mpl-data/matplotlibrc setup.cfg
 	rm -rf build
 	rm -rf lib/matplotlib.egg-info
 
@@ -92,6 +96,10 @@ clean:
 
 	# remove embedded CXX to prevent it to be picked up
 	rm -rf extern/CXX/
+
+	# remove auto-generated version file
+	rm -f lib/matplotlib/_version.py
+	rm -rf .eggs/
 
 # install
 install-arch: build-arch install-arch-stamp
@@ -128,7 +136,7 @@ install-arch-stamp: build-arch-stamp
 	-rm $(CURDIR)/debian/$(p3)/usr/lib/python3/dist-packages/matplotlib/backends/web_backend/jquery/css/themes/base/jquery-ui.min.css
 
 	# replace minified jquery with packaged version and hope it works
-	for i in $(PY3VERS); do \
+	-for i in $(PY3VERS); do \
 	    dh_link -ppython3-matplotlib usr/share/javascript/jquery/jquery.min.js \
 	      usr/lib/python3/dist-packages/matplotlib/backends/web_backend/jquery/js/jquery-1.7.1.min.js; \
 	    dh_link -ppython3-matplotlib usr/share/javascript/jquery-ui/jquery-ui.min.js \
@@ -144,6 +152,8 @@ install-indep: build-indep
 	dh_testroot -i
 	dh_prep
 	dh_install -p $(pdata)
+	# set the default backend
+	sed -i '/backend:/s/.*/backend: TkAgg/' debian/python-matplotlib-data//etc/matplotlibrc
 	rm -fr $(CURDIR)/debian/$(pdata)/usr/share/matplotlib/mpl-data/fonts/ttf/Vera*.ttf
 	rm -fr $(CURDIR)/debian/$(pdata)/usr/share/matplotlib/mpl-data/fonts/ttf/*.TXT
 	rm -fr $(CURDIR)/debian/$(pdata)/usr/share/matplotlib/mpl-data/fonts/ttf/local.conf
@@ -155,13 +165,10 @@ binary-indep: build-indep install-indep
 	dh_testdir -i
 	dh_testroot -i
 	dh_installchangelogs
-	dh_installdocs -p$(pd) -i #doc/build/html/ tutorials/
+	dh_installdocs -p$(pdata)
 	# remove pyc file from doc
-	dh_installexamples -p$(pd) -i examples/*
 	dh_compress -i -Xexamples -Xexamples/data -Xpdf -X.js -X.py -Xobjects.inv -X.html
 	dh_link -i
-	dh_sphinxdoc
-	find $(CURDIR)/debian/$(pd)/ -type f -name '*.pyc' | xargs --no-run-if-empty rm
 	dh_lintian -i
 	dh_fixperms -i
 	dh_installdeb -i

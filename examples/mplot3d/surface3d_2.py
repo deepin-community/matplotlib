@@ -11,7 +11,7 @@ import numpy as np
 
 
 fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
+ax = fig.add_subplot(projection='3d')
 
 # Make data
 u = np.linspace(0, 2 * np.pi, 100)
@@ -22,5 +22,8 @@ z = 10 * np.outer(np.ones(np.size(u)), np.cos(v))
 
 # Plot the surface
 ax.plot_surface(x, y, z)
+
+# Set an equal aspect ratio
+ax.set_aspect('equal')
 
 plt.show()

@@ -24,8 +24,12 @@ item explicitly.
 
 .. note::
 
-   `~.axes.Axes.set_axisbelow` and :rc:`axes.axisbelow` can further modify the
-   zorder of ticks and grid lines.
+   `~.axes.Axes.set_axisbelow` and :rc:`axes.axisbelow` are convenient helpers
+   for setting the zorder of ticks and grid lines.
+
+Drawing is done per `~.axes.Axes` at a time. If you have overlapping Axes, all
+elements of the second Axes are drawn on top of the first Axes, irrespective of
+their relative zorder.
 """
 
 import matplotlib.pyplot as plt
@@ -57,7 +61,7 @@ plt.tight_layout()
 
 ###############################################################################
 # Many functions that create a visible object accepts a ``zorder`` parameter.
-# Alternatively, you can call ``set_order()`` on the created object later.
+# Alternatively, you can call ``set_zorder()`` on the created object later.
 
 x = np.linspace(0, 7.5, 100)
 plt.rcParams['lines.linewidth'] = 5
