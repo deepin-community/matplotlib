@@ -18,18 +18,13 @@ environment:
     PYTHONIOENCODING: UTF-8
     PYTEST_ARGS: -raR --numprocesses=auto --timeout=300 --durations=25
                  --cov-report= --cov=lib --log-level=DEBUG
-    PINNEDVERS: "pyzmq!=21.0.0"
 
   matrix:
-    # In theory we could use a single CONDA_INSTALL_LOCN because we construct
-    # the envs anyway. But using one for the right python version hopefully
-    # making things faster due to package caching.
-    - PYTHON_VERSION: "3.6"
-      CONDA_INSTALL_LOCN: "C:\\Miniconda36-x64"
+    - PYTHON_VERSION: "3.8"
+      CONDA_INSTALL_LOCN: "C:\\Miniconda3-x64"
       TEST_ALL: "no"
-      EXTRAREQS: "-r requirements/testing/travis_extra.txt"
-    - PYTHON_VERSION: "3.7"
-      CONDA_INSTALL_LOCN: "C:\\Miniconda37-x64"
+    - PYTHON_VERSION: "3.9"
+      CONDA_INSTALL_LOCN: "C:\\Miniconda3-x64"
       TEST_ALL: "no"
 
 # We always use a 64-bit machine, but can build x86 distributions
@@ -54,21 +49,13 @@ install:
   - conda config --prepend channels conda-forge
 
   # For building, use a new environment
-  - conda create -q -n test-environment python=%PYTHON_VERSION% tk
-  - activate test-environment
+  # Add python version to environment
+  # `^ ` escapes spaces for indentation
+  - echo ^ ^ - python=%PYTHON_VERSION% >> environment.yml
+  - conda env create -f environment.yml
+  - activate mpl-dev
+  - conda install -c conda-forge pywin32
   - echo %PYTHON_VERSION% %TARGET_ARCH%
-  # Install dependencies from PyPI.
-  - python -mpip install --upgrade -r requirements/testing/travis_all.txt %EXTRAREQS% %PINNEDVERS%
-  # Install optional dependencies from PyPI.
-  # Sphinx is needed to run sphinxext tests
-  - python -mpip install --upgrade sphinx
-
-  # Apply patch to `subprocess` on Python versions > 2 and < 3.6.3
-  # https://github.com/matplotlib/matplotlib/issues/9176
-  - python -c "import sys; sys.exit(not (3,) < sys.version_info < (3,6,3))" && (
-    curl -sL https://github.com/python/cpython/pull/1224.patch |
-    patch -fsup 1 -d %CONDA_PREFIX% ) || cmd /c "exit /b 0"
-
   # Show the installed packages + versions
   - conda list
 
@@ -92,23 +79,13 @@ test_script:
   - echo The following args are passed to pytest %PYTEST_ARGS%
   - pytest %PYTEST_ARGS%
 
-after_test:
-  # After the tests were a success, build wheels.
-  # Hide the output, the copied files really clutter the build log...
-  - 'python setup.py bdist_wheel > NUL:'
-  - dir dist\
-  - echo finished...
-
 artifacts:
-  - path: dist\*
-    name: packages
-
   - path: result_images\*
     name: result_images
     type: zip
 
 on_finish:
-  - pip install codecov
+  - conda install codecov
   - codecov -e PYTHON_VERSION PLATFORM
 
 on_failure:

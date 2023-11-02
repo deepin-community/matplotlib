@@ -48,9 +48,9 @@ ax.set_facecolor('#eafff5')
 # 3) gray level string:
 ax.set_title('Voltage vs. time chart', color='0.7')
 # 4) single letter color string
-ax.set_xlabel('time (s)', color='c')
+ax.set_xlabel('Time [s]', color='c')
 # 5) a named color:
-ax.set_ylabel('voltage (mV)', color='peachpuff')
+ax.set_ylabel('Voltage [mV]', color='peachpuff')
 # 6) a named xkcd color:
 ax.plot(t, s, 'xkcd:crimson')
 # 7) Cn notation:
@@ -63,19 +63,15 @@ plt.show()
 
 #############################################################################
 #
-# ------------
+# .. admonition:: References
 #
-# References
-# """"""""""
+#    The use of the following functions, methods, classes and modules is shown
+#    in this example:
 #
-# The use of the following functions, methods, classes and modules is shown
-# in this example:
-
-import matplotlib
-matplotlib.colors
-matplotlib.axes.Axes.plot
-matplotlib.axes.Axes.set_facecolor
-matplotlib.axes.Axes.set_title
-matplotlib.axes.Axes.set_xlabel
-matplotlib.axes.Axes.set_ylabel
-matplotlib.axes.Axes.tick_params
+#    - `matplotlib.colors`
+#    - `matplotlib.axes.Axes.plot`
+#    - `matplotlib.axes.Axes.set_facecolor`
+#    - `matplotlib.axes.Axes.set_title`
+#    - `matplotlib.axes.Axes.set_xlabel`
+#    - `matplotlib.axes.Axes.set_ylabel`
+#    - `matplotlib.axes.Axes.tick_params`
