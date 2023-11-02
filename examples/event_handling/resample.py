@@ -6,6 +6,14 @@ Resampling Data
 Downsampling lowers the sample rate or sample size of a signal. In
 this tutorial, the signal is downsampled when the plot is adjusted
 through dragging and zooming.
+
+.. note::
+    This example exercises the interactive capabilities of Matplotlib, and this
+    will not appear in the static documentation. Please run this code on your
+    machine to see the interactivity.
+
+    You can copy and paste individual parts, or download the entire example
+    using the link at the bottom of the page.
 """
 
 import numpy as np
@@ -25,7 +33,7 @@ class DataDisplayDownsampler:
         mask = (self.origXData > xstart) & (self.origXData < xend)
         # dilate the mask by one to catch the points just outside
         # of the view range to not truncate the line
-        mask = np.convolve([1, 1], mask, mode='same').astype(bool)
+        mask = np.convolve([1, 1, 1], mask, mode='same').astype(bool)
         # sort out how many points to drop
         ratio = max(np.sum(mask) // self.max_points, 1)
 

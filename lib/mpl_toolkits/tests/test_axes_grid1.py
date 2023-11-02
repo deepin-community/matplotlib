@@ -1,21 +1,24 @@
 from itertools import product
 import platform
 
-import matplotlib
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib import cbook
-from matplotlib.cbook import MatplotlibDeprecationWarning
 from matplotlib.backend_bases import MouseEvent
 from matplotlib.colors import LogNorm
 from matplotlib.transforms import Bbox, TransformedBbox
 from matplotlib.testing.decorators import (
-    image_comparison, remove_ticks_and_titles)
+    check_figures_equal, image_comparison, remove_ticks_and_titles)
 
 from mpl_toolkits.axes_grid1 import (
-    axes_size as Size, host_subplot, make_axes_locatable, AxesGrid, ImageGrid)
+    axes_size as Size,
+    host_subplot, make_axes_locatable,
+    Grid, AxesGrid, ImageGrid)
 from mpl_toolkits.axes_grid1.anchored_artists import (
     AnchoredSizeBar, AnchoredDirectionArrows)
-from mpl_toolkits.axes_grid1.axes_divider import HBoxDivider
+from mpl_toolkits.axes_grid1.axes_divider import (
+    Divider, HBoxDivider, make_axes_area_auto_adjustable)
+from mpl_toolkits.axes_grid1.axes_rgb import RGBAxes
 from mpl_toolkits.axes_grid1.inset_locator import (
     zoomed_inset_axes, mark_inset, inset_axes, BboxConnectorPatch)
 import mpl_toolkits.axes_grid1.mpl_axes
@@ -37,7 +40,6 @@ def test_divider_append_axes():
         "right": divider.append_axes("right", 1.2, pad=0.1, sharey=ax),
     }
     fig.canvas.draw()
-    renderer = fig.canvas.get_renderer()
     bboxes = {k: axs[k].get_window_extent() for k in axs}
     dpi = fig.dpi
     assert bboxes["top"].height == pytest.approx(1.2 * dpi)
@@ -57,9 +59,8 @@ def test_divider_append_axes():
 @image_comparison(['twin_axes_empty_and_removed'], extensions=["png"], tol=1)
 def test_twin_axes_empty_and_removed():
     # Purely cosmetic font changes (avoid overlap)
-    matplotlib.rcParams.update({"font.size": 8})
-    matplotlib.rcParams.update({"xtick.labelsize": 8})
-    matplotlib.rcParams.update({"ytick.labelsize": 8})
+    mpl.rcParams.update(
+        {"font.size": 8, "xtick.labelsize": 8, "ytick.labelsize": 8})
     generators = ["twinx", "twiny", "twin"]
     modifiers = ["", "host invisible", "twin removed", "twin invisible",
                  "twin removed\nhost invisible"]
@@ -83,10 +84,7 @@ def test_twin_axes_empty_and_removed():
     plt.subplots_adjust(wspace=0.5, hspace=1)
 
 
-@pytest.mark.parametrize("legacy_colorbar", [False, True])
-def test_axesgrid_colorbar_log_smoketest(legacy_colorbar):
-    matplotlib.rcParams["mpl_toolkits.legacy_colorbar"] = legacy_colorbar
-
+def test_axesgrid_colorbar_log_smoketest():
     fig = plt.figure()
     grid = AxesGrid(fig, 111,  # modified to be only subplot
                     nrows_ncols=(1, 1),
@@ -99,11 +97,19 @@ def test_axesgrid_colorbar_log_smoketest(legacy_colorbar):
     Z = 10000 * np.random.rand(10, 10)
     im = grid[0].imshow(Z, interpolation="nearest", norm=LogNorm())
 
-    if legacy_colorbar:
-        with pytest.warns(MatplotlibDeprecationWarning):
-            grid.cbar_axes[0].colorbar(im)
-    else:
-        grid.cbar_axes[0].colorbar(im)
+    grid.cbar_axes[0].colorbar(im)
+
+
+def test_inset_colorbar_tight_layout_smoketest():
+    fig, ax = plt.subplots(1, 1)
+    pts = ax.scatter([0, 1], [0, 1], c=[1, 5])
+
+    cax = inset_axes(ax, width="3%", height="70%")
+    plt.colorbar(pts, cax=cax)
+
+    with pytest.warns(UserWarning, match="This figure includes Axes"):
+        # Will warn, but not raise an error
+        plt.tight_layout()
 
 
 @image_comparison(['inset_locator.png'], style='default', remove_text=True)
@@ -118,7 +124,6 @@ def test_inset_locator():
     ny, nx = Z.shape
     Z2[30:30+ny, 30:30+nx] = Z
 
-    # extent = [-3, 4, -4, 3]
     ax.imshow(Z2, extent=extent, interpolation="nearest",
               origin="lower")
 
@@ -160,7 +165,6 @@ def test_inset_axes():
     ny, nx = Z.shape
     Z2[30:30+ny, 30:30+nx] = Z
 
-    # extent = [-3, 4, -4, 3]
     ax.imshow(Z2, extent=extent, interpolation="nearest",
               origin="lower")
 
@@ -259,8 +263,8 @@ def test_fill_facecolor():
     axins = zoomed_inset_axes(ax[0], 1, loc='upper right')
     axins.set_xlim(0, 0.2)
     axins.set_ylim(0, 0.2)
-    plt.gca().axes.get_xaxis().set_ticks([])
-    plt.gca().axes.get_yaxis().set_ticks([])
+    plt.gca().axes.xaxis.set_ticks([])
+    plt.gca().axes.yaxis.set_ticks([])
     mark_inset(ax[0], axins, loc1=2, loc2=4, fc="b", ec="0.5")
 
     # fill with yellow by setting 'facecolor' field
@@ -276,8 +280,8 @@ def test_fill_facecolor():
     axins = zoomed_inset_axes(ax[1], 1, loc='upper right')
     axins.set_xlim(0, 0.2)
     axins.set_ylim(0, 0.2)
-    plt.gca().axes.get_xaxis().set_ticks([])
-    plt.gca().axes.get_yaxis().set_ticks([])
+    plt.gca().axes.xaxis.set_ticks([])
+    plt.gca().axes.yaxis.set_ticks([])
     mark_inset(ax[1], axins, loc1=2, loc2=4, facecolor="y", ec="0.5")
 
     # fill with green by setting 'color' field
@@ -293,8 +297,8 @@ def test_fill_facecolor():
     axins = zoomed_inset_axes(ax[2], 1, loc='upper right')
     axins.set_xlim(0, 0.2)
     axins.set_ylim(0, 0.2)
-    plt.gca().axes.get_xaxis().set_ticks([])
-    plt.gca().axes.get_yaxis().set_ticks([])
+    plt.gca().axes.xaxis.set_ticks([])
+    plt.gca().axes.yaxis.set_ticks([])
     mark_inset(ax[2], axins, loc1=2, loc2=4, color="g", ec="0.5")
 
     # fill with green but color won't show if set fill to False
@@ -310,8 +314,8 @@ def test_fill_facecolor():
     axins = zoomed_inset_axes(ax[3], 1, loc='upper right')
     axins.set_xlim(0, 0.2)
     axins.set_ylim(0, 0.2)
-    axins.get_xaxis().set_ticks([])
-    axins.get_yaxis().set_ticks([])
+    axins.xaxis.set_ticks([])
+    axins.yaxis.set_ticks([])
     mark_inset(ax[3], axins, loc1=2, loc2=4, fc="g", ec="0.5", fill=False)
 
 
@@ -356,7 +360,8 @@ def test_anchored_direction_arrows_many_args():
 def test_axes_locatable_position():
     fig, ax = plt.subplots()
     divider = make_axes_locatable(ax)
-    cax = divider.append_axes('right', size='5%', pad='2%')
+    with mpl.rc_context({"figure.subplot.wspace": 0.02}):
+        cax = divider.append_axes('right', size='5%')
     fig.canvas.draw()
     assert np.isclose(cax.get_position(original=False).width,
                       0.03621495327102808)
@@ -371,10 +376,9 @@ def test_image_grid():
 
     fig = plt.figure(1, (4, 4))
     grid = ImageGrid(fig, 111, nrows_ncols=(2, 2), axes_pad=0.1)
-
+    assert grid.get_axes_pad() == (0.1, 0.1)
     for i in range(4):
         grid[i].imshow(im, interpolation='nearest')
-        grid[i].set_title('test {0}{0}'.format(i))
 
 
 def test_gettightbbox():
@@ -478,3 +482,120 @@ def test_axes_class_tuple():
     fig = plt.figure()
     axes_class = (mpl_toolkits.axes_grid1.mpl_axes.Axes, {})
     gr = AxesGrid(fig, 111, nrows_ncols=(1, 1), axes_class=axes_class)
+
+
+def test_grid_axes_lists():
+    """Test Grid axes_all, axes_row and axes_column relationship."""
+    fig = plt.figure()
+    grid = Grid(fig, 111, (2, 3), direction="row")
+    assert_array_equal(grid, grid.axes_all)
+    assert_array_equal(grid.axes_row, np.transpose(grid.axes_column))
+    assert_array_equal(grid, np.ravel(grid.axes_row), "row")
+    assert grid.get_geometry() == (2, 3)
+    grid = Grid(fig, 111, (2, 3), direction="column")
+    assert_array_equal(grid, np.ravel(grid.axes_column), "column")
+
+
+@pytest.mark.parametrize('direction', ('row', 'column'))
+def test_grid_axes_position(direction):
+    """Test positioning of the axes in Grid."""
+    fig = plt.figure()
+    grid = Grid(fig, 111, (2, 2), direction=direction)
+    loc = [ax.get_axes_locator() for ax in np.ravel(grid.axes_row)]
+    assert loc[1]._nx > loc[0]._nx and loc[2]._ny < loc[0]._ny
+    assert loc[0]._nx == loc[2]._nx and loc[0]._ny == loc[1]._ny
+    assert loc[3]._nx == loc[1]._nx and loc[3]._ny == loc[2]._ny
+
+
+@pytest.mark.parametrize('rect, ngrids, error, message', (
+    ((1, 1), None, TypeError, "Incorrect rect format"),
+    (111, -1, ValueError, "ngrids must be positive"),
+    (111, 7, ValueError, "ngrids must be positive"),
+))
+def test_grid_errors(rect, ngrids, error, message):
+    fig = plt.figure()
+    with pytest.raises(error, match=message):
+        Grid(fig, rect, (2, 3), ngrids=ngrids)
+
+
+@pytest.mark.parametrize('anchor, error, message', (
+    (None, TypeError, "anchor must be str"),
+    ("CC", ValueError, "'CC' is not a valid value for anchor"),
+    ((1, 1, 1), TypeError, "anchor must be str"),
+))
+def test_divider_errors(anchor, error, message):
+    fig = plt.figure()
+    with pytest.raises(error, match=message):
+        Divider(fig, [0, 0, 1, 1], [Size.Fixed(1)], [Size.Fixed(1)],
+                anchor=anchor)
+
+
+@check_figures_equal(extensions=["png"])
+def test_mark_inset_unstales_viewlim(fig_test, fig_ref):
+    inset, full = fig_test.subplots(1, 2)
+    full.plot([0, 5], [0, 5])
+    inset.set(xlim=(1, 2), ylim=(1, 2))
+    # Check that mark_inset unstales full's viewLim before drawing the marks.
+    mark_inset(full, inset, 1, 4)
+
+    inset, full = fig_ref.subplots(1, 2)
+    full.plot([0, 5], [0, 5])
+    inset.set(xlim=(1, 2), ylim=(1, 2))
+    mark_inset(full, inset, 1, 4)
+    # Manually unstale the full's viewLim.
+    fig_ref.canvas.draw()
+
+
+def test_auto_adjustable():
+    fig = plt.figure()
+    ax = fig.add_axes([0, 0, 1, 1])
+    pad = 0.1
+    make_axes_area_auto_adjustable(ax, pad=pad)
+    fig.canvas.draw()
+    tbb = ax.get_tightbbox()
+    assert tbb.x0 == pytest.approx(pad * fig.dpi)
+    assert tbb.x1 == pytest.approx(fig.bbox.width - pad * fig.dpi)
+    assert tbb.y0 == pytest.approx(pad * fig.dpi)
+    assert tbb.y1 == pytest.approx(fig.bbox.height - pad * fig.dpi)
+
+
+@image_comparison(['rgb_axes.png'], remove_text=True)
+def test_rgb_axes():
+    fig = plt.figure()
+    ax = RGBAxes(fig, (0.1, 0.1, 0.8, 0.8), pad=0.1)
+    rng = np.random.default_rng(19680801)
+    r = rng.random((5, 5))
+    g = rng.random((5, 5))
+    b = rng.random((5, 5))
+    ax.imshow_rgb(r, g, b, interpolation='none')
+
+
+def test_removal():
+    import matplotlib.pyplot as plt
+    import mpl_toolkits.axisartist as AA
+    fig = plt.figure()
+    ax = host_subplot(111, axes_class=AA.Axes, figure=fig)
+    col = ax.fill_between(range(5), 0, range(5))
+    fig.canvas.draw()
+    col.remove()
+    fig.canvas.draw()
+
+
+@image_comparison(['anchored_locator_base_call.png'], style="mpl20")
+def test_anchored_locator_base_call():
+    fig = plt.figure(figsize=(3, 3))
+    fig1, fig2 = fig.subfigures(nrows=2, ncols=1)
+
+    ax = fig1.subplots()
+    ax.set(aspect=1, xlim=(-15, 15), ylim=(-20, 5))
+    ax.set(xticks=[], yticks=[])
+
+    Z = cbook.get_sample_data(
+        "axes_grid/bivariate_normal.npy", np_load=True
+    )
+    extent = (-3, 4, -4, 3)
+
+    axins = zoomed_inset_axes(ax, zoom=2, loc="upper left")
+    axins.set(xticks=[], yticks=[])
+
+    axins.imshow(Z, extent=extent, origin="lower")

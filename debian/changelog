@@ -1,3 +1,241 @@
+matplotlib (3.6.3-1) unstable; urgency=medium
+
+  * New upstream release
+  * debian/patches/PR24862.patch
+    - refresh patch
+  * debian/copyright
+    - extend packaging copyright years
+
+ -- Sandro Tosi <morph@debian.org>  Wed, 18 Jan 2023 21:43:01 -0500
+
+matplotlib (3.6.2-4) unstable; urgency=medium
+
+  * debian/rules
+    - run dh_installdocs on the -data pkg, to unstall changelog;
+      Closes: #1027049
+  * debian/patches/PR24862.patch
+    - Fix argument checking in Axes3D.quiver; Closes: #1027285
+
+ -- Sandro Tosi <morph@debian.org>  Thu, 05 Jan 2023 23:52:41 -0500
+
+matplotlib (3.6.2-3) unstable; urgency=medium
+
+  * upload to unstable
+
+ -- Sandro Tosi <morph@debian.org>  Sun, 25 Dec 2022 14:49:42 -0500
+
+matplotlib (3.6.2-2) experimental; urgency=medium
+
+  * debian/control
+    - add contourpy to b-d, needed by tests
+    - add b-d needed by tests: cairo, cm-super-minimal, contourpy, ffmpeg,
+      fonts-noto-cjk, fonts-wqy-zenhei, imagemagick, pikepdf, texlive-base,
+      texlive-luatex, texlive-science, texlive-xetex, wxgtk4.0, xarray
+    - drop XS-Python-Version, no longer needed
+  * debian/rules
+    - enable test_contour.py tests
+    - exclude another test failing with Qt
+  * debian/tests
+    - use py3versions --supported
+
+ -- Sandro Tosi <morph@debian.org>  Fri, 23 Dec 2022 23:24:09 -0500
+
+matplotlib (3.6.2-1) experimental; urgency=medium
+
+  [ Stefano Rivera ]
+  * Revert the temporary inkscape change.
+
+  [ Sandro Tosi ]
+  * New upstream release
+  * keep inkscrape disabled in b-d
+  * debian/patches
+    - refresh patches
+  * debian/rules
+    - remove .eggs directory, created by setuptools-scm
+    - skip failing tests
+  * Stop building the -doc package; the cost of maintaining the build process
+    and packaging more and more new packages is no longer sustainable, given the
+    few users actually installing it.
+  * debian/control
+    - add fonttools to b-d, needed by tests
+
+ -- Sandro Tosi <morph@debian.org>  Mon, 19 Dec 2022 01:56:13 -0500
+
+matplotlib (3.5.2-4) unstable; urgency=medium
+
+  * Team upload.
+  * Move all the <!nodoc> Build-Depends to Build-Depends-Indep (to avoid
+    indirectly Build-Depending on inkscape, right now).
+
+ -- Stefano Rivera <stefanor@debian.org>  Sun, 13 Nov 2022 14:38:38 +0200
+
+matplotlib (3.5.2-3) unstable; urgency=medium
+
+  * Team upload.
+  * Build without inkscape, which is currently FTBFS, temporarily.
+
+ -- Stefano Rivera <stefanor@debian.org>  Sun, 13 Nov 2022 12:55:09 +0200
+
+matplotlib (3.5.2-2) unstable; urgency=medium
+
+  * debian/rules, debian/patches/fake-setutools-scm.patch
+    - remove lib/matplotlib/_version.py in the clean target instead of trying
+      to mess with it; Closes: #1015081
+
+ -- Sandro Tosi <morph@debian.org>  Sun, 17 Jul 2022 18:45:39 -0400
+
+matplotlib (3.5.2-1) unstable; urgency=medium
+
+  * New upstream release
+  * debian/patches/
+    - refresh/drop patches
+  * debian/control
+    - add cm-super-minimal to matplotlib Suggests; Closes: #1010216
+    - bump Standards-Version to 4.6.1 (no changes needed)
+
+  [ Laurent Bigonville ]
+  * debian/control
+    - Mark python-matplotlib-doc with <!nodoc> build-profile
+  * debian/rules
+    - Do not build the doc if the <nodoc> profile is set
+
+ -- Sandro Tosi <morph@debian.org>  Wed, 22 Jun 2022 20:14:39 -0400
+
+matplotlib (3.5.1-3) unstable; urgency=medium
+
+  * debian/control debian/patches/docs-still-use-pydata-theme.patch
+    - add mpl-mpl-sphinx-theme to b-d, needed for doc, and drop the patch which
+      disabled it before
+
+ -- Sandro Tosi <morph@debian.org>  Tue, 21 Jun 2022 14:28:46 -0400
+
+matplotlib (3.5.1-2) unstable; urgency=medium
+
+  * debian/rules
+    - workaround a gcc-11 on mips64* architectures by passing -O3; patch by
+      YunQiang Su; Closes: #1000435
+
+ -- Sandro Tosi <morph@debian.org>  Tue, 25 Jan 2022 16:55:24 -0500
+
+matplotlib (3.5.1-1) unstable; urgency=medium
+
+  * New upstream release
+  * debian/python-matplotlib-data.install
+   - install the entire content of mpl-data for python-matplotlib-data,
+     including kpsewhich.lua; Closes: #1002923
+  * re-enable doc building
+  * debian/copyright
+    - extend packaging copyright years
+  * debian/patches
+    - refresh, drop patches merged upstream
+  * debian/rules
+    - use pytest directly when running the test suite
+    - ignore test_backend_nbagg.py, until nbconvert is made compatible with
+      mistune 2.x, see #1001283 and #1002372
+
+ -- Sandro Tosi <morph@debian.org>  Sun, 02 Jan 2022 16:42:00 -0500
+
+matplotlib (3.5.0-5) unstable; urgency=medium
+
+  * Comment out sphinx-gallery from b-d, and dont build doc, once again hoping
+    this will fix the dependency loop currently preventin mpl to be build on
+    buildds
+
+ -- Sandro Tosi <morph@debian.org>  Tue, 07 Dec 2021 01:26:30 -0500
+
+matplotlib (3.5.0-4) unstable; urgency=medium
+
+  * debian/control
+    - use source:Upstream-Version when defining Depends on -data, fixing a
+      FTBFS on buildds due to circular dependencies
+
+ -- Sandro Tosi <morph@debian.org>  Mon, 06 Dec 2021 23:07:14 -0500
+
+matplotlib (3.5.0-3) unstable; urgency=medium
+
+  * debian/control
+    - move pil.imagetk to Depends, so everyone's happy; Closes: #999533
+  * debian/patches/PR21686.patch
+    - add PR 21686, fixing sagemath doc build; Closes: #1001102
+
+ -- Sandro Tosi <morph@debian.org>  Mon, 06 Dec 2021 00:22:14 -0500
+
+matplotlib (3.5.0-2) unstable; urgency=medium
+
+  * debian/control
+    - add sphinx-panels to b-d, needed by doc
+  * debian/patches/docs-no-sphinx-panel.patch
+    - remove, now sphinx-panels is in Debian
+
+ -- Sandro Tosi <morph@debian.org>  Sat, 27 Nov 2021 02:02:11 -0500
+
+matplotlib (3.5.0-1) unstable; urgency=medium
+
+  * New upstream release
+  * debian/control
+    - bump b-d on sphinx-gallery to >= 0.10.0
+    - bump b-d on numpy to >= 1.20.0
+    - bump Standards-Version to 4.6.0.1 (no changes needed)
+  * debian/patches
+    - refresh, remove merged patches
+  * debian/patches/docs-still-use-pydata-theme.patch
+    - keep using pydata_sphinx_theme until mpl_sphinx_theme is available
+  * debian/rules
+    - no longer manually copy cliboard.js, now that sphinx-copybutton is fixed
+  * debian/tests/control
+    - fix autopkgtests but installing pil.imagetk and allowing stderr
+  * debian/copyright
+    - simplify and fix afm fonts copyright generation
+  * debian/TODO.debian
+    - remove, no longer relevant
+
+ -- Sandro Tosi <morph@debian.org>  Sun, 21 Nov 2021 00:03:30 -0500
+
+matplotlib (3.5.0~rc1-2) experimental; urgency=medium
+
+  * debian/copyright
+    - remove stanzas for files no longer in upstream tarball
+  * debian/python-matplotlib-data.install
+    - install plot_directive in mpl-data, needed by
+      matplotlib.sphinxext.plot_directive
+
+ -- Sandro Tosi <morph@debian.org>  Tue, 09 Nov 2021 23:53:58 -0500
+
+matplotlib (3.5.0~rc1-1) experimental; urgency=medium
+
+  * New upstream release candidate; Closes: #994533
+  * debian/patches/
+    - refresh, remove outdated patches
+  * debian/patches/fake-setutools-scm.patch
+    - fake setuptools_scm, creating the same file it would
+  * debian/control
+    - add setuptools-scm, setuptools-scm-git-archive to b-d, needed by setup.py
+    - replace transitional pkg ttf-staypuft with fonts-staypuft; Closes: #987629
+    - replace obsolete ttf-bitstream-vera with fonts-dejavu-core;
+      Closes: #985559
+    - add pil.imagetk to b-d, needed by tests
+    - add ffmpeg, fonts-comic-neue, fonts-humor-sans, fonttools,
+      pydata-sphinx-theme to b-d, needed by doc
+    - drop nose, no longer needed (see #997758)
+    - add pil.imagetk to python3-matplotlib recommends, needed by TkAgg backend
+    - set TkAgg as default backend in /etc/matplotlibrc
+  * rename setup.cfg to the new filename, mplsetup.cfg
+  * use the system-available libqhull during build
+  * debian/rules
+    - skip removing some of upstream config files, setup.cfg and matplotlibrc
+    - set HOME to a writable location during doc build
+    - manually copy clipboard.js
+  * debian/patches/PR21414.patch
+    - fix doc build with a basedir containing a ~, like in Debian's RC releases
+  * debian/patches/20_matplotlibrc_path_search_fix.patch
+    - handle date directory location both during build and at runtime
+  * debian/patches/docs-no-sphinx-panel.patch
+    - temporarily remove sphinx-panels extension
+  * debian/python-matplotlib-data.install
+    - update locationfor default matplotlibrc location
+
+ -- Sandro Tosi <morph@debian.org>  Wed, 27 Oct 2021 01:43:15 -0400
+
 matplotlib (3.3.4-2) unstable; urgency=medium
 
   * remove -dbg package; Closes: #994311

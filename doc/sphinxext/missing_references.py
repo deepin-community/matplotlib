@@ -90,7 +90,7 @@ def get_location(node, app):
     Usually, this will be of the form "path/to/file:linenumber". Two
     special values can be emitted, "<external>" for paths which are
     not contained in this source tree (e.g. docstrings included from
-    other modules) or "<unknown>", inidcating that the sphinx application
+    other modules) or "<unknown>", indicating that the sphinx application
     cannot locate the original source file (usually because an extension
     has injected text into the sphinx parsing engine).
     """
@@ -136,7 +136,7 @@ def _truncate_location(location):
     """
     Cuts off anything after the first colon in location strings.
 
-    This allows for easy comparison even when line numbers chagne
+    This allows for easy comparison even when line numbers change
     (as they do regularly).
     """
     return location.split(":", 1)[0]
@@ -173,7 +173,7 @@ def _warn_unused_missing_references(app):
                 msg = (f"Reference {domain_type} {target} for "
                        f"{ignored_reference_location} can be removed"
                        f" from {app.config.missing_references_filename}."
-                        "It is no longer a missing reference in the docs.")
+                        " It is no longer a missing reference in the docs.")
                 logger.warning(msg,
                                location=ignored_reference_location,
                                type='ref',

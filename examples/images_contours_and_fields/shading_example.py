@@ -7,7 +7,7 @@ Example showing how to make shaded relief plots like Mathematica_ or
 `Generic Mapping Tools`_.
 
 .. _Mathematica: http://reference.wolfram.com/mathematica/ref/ReliefPlot.html
-.. _Generic Mapping Tools: https://gmt.soest.hawaii.edu/
+.. _Generic Mapping Tools: https://www.generic-mapping-tools.org/
 """
 
 import numpy as np
@@ -64,15 +64,10 @@ if __name__ == '__main__':
 
 #############################################################################
 #
-# ------------
+# .. admonition:: References
 #
-# References
-# """"""""""
+#    The use of the following functions, methods, classes and modules is shown
+#    in this example:
 #
-# The use of the following functions, methods and classes is shown in this
-# example:
-
-import matplotlib
-matplotlib.colors.LightSource
-matplotlib.axes.Axes.imshow
-matplotlib.pyplot.imshow
+#    - `matplotlib.colors.LightSource`
+#    - `matplotlib.axes.Axes.imshow` / `matplotlib.pyplot.imshow`

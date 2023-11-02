@@ -74,7 +74,7 @@ Previously, certain locator classes (`~.ticker.LogLocator`,
 tick locations that collided with major ticks when they were used as
 minor locators.  This logic has now moved to the `~.axis.Axis` class,
 and is used regardless of the locator class.  You can control this
-behavior via the `~.Axis.remove_overlaping_locs` attribute on
+behavior via the `~.Axis.remove_overlapping_locs` attribute on
 `~.axis.Axis`.
 
 If you were relying on both the major and minor tick labels to appear
@@ -236,18 +236,18 @@ Input that consists of multiple empty lists will now return a list of histogram
 values for each one of the lists. For example, an input of ``[[],[]]`` will
 return 2 lists of histogram values. Previously, a single list was returned.
 
-`.backend_bases.Timer.remove_callback` future signature change
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``backend_bases.TimerBase.remove_callback`` future signature change
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Currently, ``backend_bases.Timer.remove_callback(func, *args,
+Currently, ``backend_bases.TimerBase.remove_callback(func, *args,
 **kwargs)`` removes a callback previously added by
 ``backend_bases.Timer.add_callback(func, *args, **kwargs)``, but if
-``*args, **kwargs`` is not passed in (ex,
-``Timer.remove_callback(func)``), then the first callback with a
+``*args, **kwargs`` is not passed in (i.e.,
+``TimerBase.remove_callback(func)``), then the first callback with a
 matching ``func`` is removed, regardless of whether it was added with
 or without ``*args, **kwargs``.
 
-In a future version, ``Timer.remove_callback`` will always use the latter
+In a future version, `.TimerBase.remove_callback` will always use the latter
 behavior (not consider ``*args, **kwargs``); to specifically consider them, add
 the callback as a `functools.partial` object ::
 
@@ -256,7 +256,7 @@ the callback as a `functools.partial` object ::
    # later
    timer.remove_callback(cb)
 
-`.backend_bases.Timer.add_callback` was modified to return *func* to
+`.TimerBase.add_callback` was modified to return *func* to
 simplify the above usage (previously it returned None); this also
 allows using it as a decorator.
 
@@ -279,7 +279,7 @@ be set to `True` ::
 
 Individual line segments can be extracted from the
 `~.collections.LineCollection` using
-`~.collections.LineCollection.get_segements()`. See the
+`~.collections.LineCollection.get_segments()`. See the
 `~.collections.LineCollection` documentation for other methods to
 retrieve the collection properties.
 
@@ -293,9 +293,9 @@ where the `.cm.ScalarMappable` passed to `matplotlib.colorbar.Colorbar`
 (`~.Figure.colorbar`) had a ``set_norm`` method, as did the colorbar.
 The colorbar is now purely a follower to the `.ScalarMappable` norm and
 colormap, and the old inherited methods
-`~matplotlib.colorbar.ColorbarBase.set_norm`,
-`~matplotlib.colorbar.ColorbarBase.set_cmap`,
-`~matplotlib.colorbar.ColorbarBase.set_clim` are deprecated, as are
+``matplotlib.colorbar.ColorbarBase.set_norm``,
+``matplotlib.colorbar.ColorbarBase.set_cmap``,
+``matplotlib.colorbar.ColorbarBase.set_clim`` are deprecated, as are
 the getter versions of those calls.  To set the norm associated with a
 colorbar do ``colorbar.mappable.set_norm()`` etc.
 
@@ -308,7 +308,7 @@ FreeType or libpng are not in the compiler or linker's default path, set the
 standard environment variables ``CFLAGS``/``LDFLAGS`` on Linux or OSX, or
 ``CL``/``LINK`` on Windows, to indicate the relevant paths.
 
-See details in :doc:`/users/installing`.
+See details in :doc:`/users/installing/index`.
 
 Setting artist properties twice or more in the same call
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -337,7 +337,7 @@ match the array value type of the ``Path.codes`` array.
 LaTeX code in matplotlibrc file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Previously, the rc file keys ``pgf.preamble`` and ``text.latex.preamble`` were
-parsed using commmas as separators. This would break valid LaTeX code, such as::
+parsed using commas as separators. This would break valid LaTeX code, such as::
 
   \usepackage[protrusion=true, expansion=false]{microtype}
 
@@ -394,11 +394,11 @@ returned.
 `matplotlib.font_manager.win32InstalledFonts` returns an empty list instead
 of None if no fonts are found.
 
-`.Axes.fmt_xdata` and `.Axes.fmt_ydata` error handling
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``Axes.fmt_xdata`` and ``Axes.fmt_ydata`` error handling
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Previously, if the user provided a `.Axes.fmt_xdata` or
-`.Axes.fmt_ydata` function that raised a `TypeError` (or set them to a
+Previously, if the user provided a ``Axes.fmt_xdata`` or
+``Axes.fmt_ydata`` function that raised a `TypeError` (or set them to a
 non-callable), the exception would be silently ignored and the default
 formatter be used instead.  This is no longer the case; the exception
 is now propagated out.
@@ -476,7 +476,7 @@ Exception changes
 - `.Axes.streamplot` does not support irregularly gridded ``x`` and ``y`` values.
   So far, it used to silently plot an incorrect result.  This has been changed to
   raise a `ValueError` instead.
-- The `.streamplot.Grid` class, which is internally used by streamplot
+- The ``streamplot.Grid`` class, which is internally used by streamplot
   code, also throws a `ValueError` when irregularly gridded values are
   passed in.
 
@@ -496,7 +496,7 @@ Classes and methods
 - ``backend_wx.Toolbar`` (use ``backend_wx.NavigationToolbar2Wx`` instead)
 - ``cbook.align_iterators`` (no replacement)
 - ``contour.ContourLabeler.get_real_label_width`` (no replacement)
-- ``legend.Legend.draggable`` (use `legend.Legend.set_draggable()` instead)
+- ``legend.Legend.draggable`` (use `.legend.Legend.set_draggable()` instead)
 - ``texmanager.TexManager.postscriptd``, ``texmanager.TexManager.pscnt``,
   ``texmanager.TexManager.make_ps``, ``texmanager.TexManager.get_ps_bbox``
   (no replacements)
@@ -566,7 +566,7 @@ in Matplotlib 2.2 has been removed. See below for a list:
 - ``mlab.safe_isnan`` (use `numpy.isnan` instead)
 - ``mlab.cohere_pairs`` (use `scipy.signal.coherence` instead)
 - ``mlab.entropy`` (use `scipy.stats.entropy` instead)
-- ``mlab.normpdf`` (use `scipy.stats.norm.pdf` instead)
+- ``mlab.normpdf`` (use ``scipy.stats.norm.pdf`` instead)
 - ``mlab.find`` (use ``np.nonzero(np.ravel(condition))`` instead)
 - ``mlab.longest_contiguous_ones``
 - ``mlab.longest_ones``
@@ -652,7 +652,7 @@ no longer available in the `pylab` module:
 - ``longest_ones``
 - ``movavg``
 - ``norm_flat`` (use ``numpy.linalg.norm(a.flat, ord=2)`` instead)
-- ``normpdf`` (use `scipy.stats.norm.pdf` instead)
+- ``normpdf`` (use ``scipy.stats.norm.pdf`` instead)
 - ``path_length``
 - ``poly_below``
 - ``poly_between``
@@ -705,7 +705,7 @@ now a no-op).
 
 The image comparison test decorators now skip (rather than xfail) the test for
 uncomparable formats. The affected decorators are `~.image_comparison` and
-`~.check_figures_equal`. The deprecated `~.ImageComparisonTest` class is
+`~.check_figures_equal`. The deprecated ``ImageComparisonTest`` class is
 likewise changed.
 
 Dependency changes
@@ -767,11 +767,12 @@ The following signature related behaviours are deprecated:
   keyword.
 - The *interp_at_native* parameter to `.BboxImage`, which has had no effect
   since Matplotlib 2.0, is deprecated.
-- All arguments to the `.cbook.deprecated` decorator and `.cbook.warn_deprecated`
-  function, except the first one (the version where the deprecation occurred),
-  are now keyword-only.  The goal is to avoid accidentally setting the "message"
-  argument when the "name" (or "alternative") argument was intended, as this has
-  repeatedly occurred in the past.
+- All arguments to the ``matplotlib.cbook.deprecation.deprecated`` decorator
+  and ``matplotlib.cbook.deprecation.warn_deprecated`` function, except the
+  first one (the version where the deprecation occurred), are now keyword-only.
+  The goal is to avoid accidentally setting the "message" argument when the
+  "name" (or "alternative") argument was intended, as this has repeatedly
+  occurred in the past.
 - The arguments of `matplotlib.testing.compare.calculate_rms` have been renamed
   from ``expectedImage, actualImage``, to ``expected_image, actual_image``.
 - Passing positional arguments to `.Axis.set_ticklabels` beyond *ticklabels*
@@ -795,10 +796,10 @@ Changes in parameter names
 - The *s* parameter to `.Annotation` (and indirectly `.Axes.annotate`) has
   been renamed to *text*.
 - The *tolerence* parameter to
-  `bezier.find_bezier_t_intersecting_with_closedpath`,
-  `bezier.split_bezier_intersecting_with_closedpath`,
-  `bezier.find_r_to_boundary_of_closedpath`,
-  `bezier.split_path_inout` and `bezier.check_if_parallel` has been renamed to
+  `.bezier.find_bezier_t_intersecting_with_closedpath`,
+  `.bezier.split_bezier_intersecting_with_closedpath`,
+  ``bezier.find_r_to_boundary_of_closedpath``,
+  `.bezier.split_path_inout` and `.bezier.check_if_parallel` has been renamed to
   *tolerance*.
 
 In each case, the old parameter name remains supported (it cannot be used
@@ -824,7 +825,7 @@ This has not been used in the codebase since its addition in 2009.
 
   This has never been used internally, there is no equivalent method exists on
   the 2D Axis classes, and despite the similar name, it has a completely
-  different behavior from the 2D Axis' `axis.Axis.get_ticks_position` method.
+  different behavior from the 2D Axis' ``axis.Axis.get_ticks_position`` method.
 - ``.backend_pgf.LatexManagerFactory``
 
 - ``mpl_toolkits.axisartist.axislines.SimpleChainedObjects``
@@ -935,8 +936,8 @@ Axes3D
 - `.axes3d.Axes3D.w_yaxis`
 - `.axes3d.Axes3D.w_zaxis`
 
-Use `.axes3d.Axes3D.xaxis`, `.axes3d.Axes3D.yaxis` and `.axes3d.Axes3D.zaxis`
-instead.
+Use ``axes3d.Axes3D.xaxis``, ``axes3d.Axes3D.yaxis`` and
+``axes3d.Axes3D.zaxis`` instead.
 
 Testing
 ~~~~~~~
@@ -944,7 +945,7 @@ Testing
 - ``matplotlib.testing.decorators.switch_backend`` decorator
 
 Test functions should use ``pytest.mark.backend``, and the mark will be
-picked up by the `matplotlib.testing.conftest.mpl_test_settings` fixture.
+picked up by the ``matplotlib.testing.conftest.mpl_test_settings`` fixture.
 
 Quiver
 ~~~~~~
@@ -960,11 +961,11 @@ GUI / backend details
 
 - ``.get_py2exe_datafiles``
 - ``.tk_window_focus``
-- `.backend_gtk3.FileChooserDialog`
-- `.backend_gtk3.NavigationToolbar2GTK3.get_filechooser`
-- `.backend_gtk3.SaveFigureGTK3.get_filechooser`
-- `.NavigationToolbar2QT.adj_window` attribute. This is unused and always ``None``.
-- `.backend_wx.IDLE_DELAY` global variable
+- ``.backend_gtk3.FileChooserDialog``
+- ``.backend_gtk3.NavigationToolbar2GTK3.get_filechooser``
+- ``.backend_gtk3.SaveFigureGTK3.get_filechooser``
+- ``.NavigationToolbar2QT.adj_window`` attribute. This is unused and always ``None``.
+- ``.backend_wx.IDLE_DELAY`` global variable
   This is unused and only relevant to the now removed wx "idling" code (note that
   as it is a module-level global, no deprecation warning is emitted when
   accessing it).
@@ -1020,7 +1021,7 @@ Use `~.path.get_path_collection_extents` instead.
 
 Use ``not np.isfinite(path.vertices).all()`` instead.
 
-- `.bezier.find_r_to_boundary_of_closedpath` function is deprecated
+- ``.bezier.find_r_to_boundary_of_closedpath`` function is deprecated
 
 This has always returned None instead of the requested radius.
 
@@ -1068,16 +1069,17 @@ Axis
 
 - ``Axis.iter_ticks``
 
-This only served as a helper to the private `.Axis._update_ticks`
+This only served as a helper to the private ``Axis._update_ticks``
 
 
 Undeprecations
 --------------
-The following API elements have bee un-deprecated:
+The following API elements have been un-deprecated:
 
-- The *obj_type* kwarg to the `.cbook.deprecated` decorator.
-- *xmin*, *xmax* kwargs to `.Axes.set_xlim` and *ymin*, *ymax* kwargs
-  to `.Axes.set_ylim`
+- The *obj_type* keyword argument to the
+  ``matplotlib.cbook.deprecation.deprecated`` decorator.
+- *xmin*, *xmax* keyword arguments to `.Axes.set_xlim` and *ymin*, *ymax*
+  keyword arguments to `.Axes.set_ylim`
 
 
 New features
@@ -1121,10 +1123,10 @@ The `.Formatter` class gained a new `~.Formatter.format_ticks` method, which
 takes the list of all tick locations as a single argument and returns the list
 of all formatted values.  It is called by the axis tick handling code and, by
 default, first calls `~.Formatter.set_locs` with all locations, then repeatedly
-calls `~.Formatter.__call__` for each location.
+calls ``Formatter.__call__`` for each location.
 
 Tick-handling code in the codebase that previously performed this sequence
-(`~.Formatter.set_locs` followed by repeated `~.Formatter.__call__`) have been
+(`~.Formatter.set_locs` followed by repeated ``Formatter.__call__``) have been
 updated to use `~.Formatter.format_ticks`.
 
 `~.Formatter.format_ticks` is intended to be overridden by `.Formatter`
