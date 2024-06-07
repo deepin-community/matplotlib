@@ -1,3 +1,24 @@
+matplotlib (3.6.3-2) unstable; urgency=medium
+
+  * Team upload.
+  * Add missing autopkgtest depend on python3-all (Closes: #1067139)
+
+ -- Timo Röhling <roehling@debian.org>  Wed, 24 Apr 2024 11:57:19 +0200
+
+matplotlib (3.6.3-1.1) unstable; urgency=medium
+
+  [ Julien Puydt ]
+  * Drop wrong depends on setuptools-scm-git-archive (Closes: #1050105).
+
+  [ Alexandre Detiste ]
+  * remove extraneous dependency on python3-six (Closes: #1039099)
+  * remove obsolete build-dep python3-mock
+
+  [ Sandro Tosi ]
+  * orphan
+
+ -- Sandro Tosi <morph@debian.org>  Sat, 02 Mar 2024 15:21:35 -0500
+
 matplotlib (3.6.3-1) unstable; urgency=medium
 
   * New upstream release
