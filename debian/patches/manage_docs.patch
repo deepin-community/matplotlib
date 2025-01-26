@@ -1,0 +1,303 @@
+Index: matplotlib/doc/conf.py
+===================================================================
+--- matplotlib.orig/doc/conf.py	2024-06-24 02:23:24.709372509 +0200
++++ matplotlib/doc/conf.py	2024-06-24 03:05:19.428099554 +0200
+@@ -90,7 +90,8 @@
+ # Unless we catch the warning explicitly somewhere, a warning should cause the
+ # docs build to fail. This is especially useful for getting rid of deprecated
+ # usage in the gallery.
+-warnings.filterwarnings('error', append=True)
++# For the debian doc build, do not treat warnings as errors (don't activate "error")
++#warnings.filterwarnings('error', append=True)
+ 
+ # Add any Sphinx extension module names here, as strings. They can be
+ # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
+@@ -221,7 +222,7 @@
+     'compress_images': ('thumbnails', 'images') if is_release_build else (),
+     'doc_module': ('matplotlib', 'mpl_toolkits'),
+     'examples_dirs': example_dirs,
+-    'filename_pattern': '^((?!sgskip).)*$',
++    'filename_pattern': '^((?!sgskip|3d|3D|axes|random_walk).)*$',
+     'gallery_dirs': gallery_dirs,
+     'image_scrapers': (matplotlib_reduced_latex_scraper, ),
+     'image_srcset': ["2x"],
+@@ -240,7 +241,7 @@
+     'thumbnail_size': (320, 224),
+     'within_subsection_order': gallery_order.subsectionorder,
+     'capture_repr': (),
+-    'copyfile_regex': r'.*\.rst',
++#    'copyfile_regex': r'.*\.rst',
+ }
+ 
+ if 'plot_gallery=0' in sys.argv:
+@@ -453,7 +454,7 @@
+             'stable' if matplotlib.__version_info__.releaselevel == 'final'
+             else 'devdocs')
+     },
+-    "navbar_end": ["theme-switcher", "version-switcher", "mpl_icon_links"],
++    "navbar_end": ["mpl_icon_links"],
+     "secondary_sidebar_items": "page-toc.html",
+     "footer_start": ["copyright", "sphinx-version", "doc_version"],
+     # We override the announcement template from pydata-sphinx-theme, where
+Index: matplotlib/galleries/tutorials/README.rst
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ matplotlib/galleries/tutorials/README.rst	2024-06-24 02:23:24.705372458 +0200
+@@ -0,0 +1,6 @@
++.. _tutorials:
++
++Tutorials
++---------
++
++Example tutorials.
+Index: matplotlib/galleries/users_explain/README.rst
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ matplotlib/galleries/users_explain/README.rst	2024-06-24 02:23:24.705372458 +0200
+@@ -0,0 +1,5 @@
++.. _users_explain:
++
++==========================
++Explanatory User tutorials
++==========================
+Index: matplotlib/doc/api/toolkits/mplot3d/axes3d.rst
+===================================================================
+--- matplotlib.orig/doc/api/toolkits/mplot3d/axes3d.rst	2024-06-24 02:23:24.709372509 +0200
++++ matplotlib/doc/api/toolkits/mplot3d/axes3d.rst	2024-06-24 02:23:24.705372458 +0200
+@@ -5,23 +5,12 @@
+ .. currentmodule:: mpl_toolkits.mplot3d.axes3d
+ 
+ 
+-.. autoclass:: Axes3D
+-   :no-members:
+-   :no-undoc-members:
+-   :show-inheritance:
+-
+-
+ .. currentmodule:: mpl_toolkits.mplot3d.axes3d.Axes3D
+ 
+ 
+ Plotting
+ --------
+ 
+-.. autosummary::
+-   :toctree: ../../_as_gen
+-   :template: autosummary.rst
+-   :nosignatures:
+-
+    plot
+    scatter
+    bar
+@@ -46,11 +35,6 @@
+ Text and annotations
+ --------------------
+ 
+-.. autosummary::
+-   :toctree: ../../_as_gen
+-   :template: autosummary.rst
+-   :nosignatures:
+-
+    text
+    text2D
+ 
+@@ -58,22 +42,12 @@
+ Clearing
+ --------
+ 
+-.. autosummary::
+-   :toctree: ../../_as_gen
+-   :template: autosummary.rst
+-   :nosignatures:
+-
+    clear
+ 
+ 
+ Appearance
+ ----------
+ 
+-.. autosummary::
+-   :toctree: ../../_as_gen
+-   :template: autosummary.rst
+-   :nosignatures:
+-
+    set_axis_off
+    set_axis_on
+    grid
+@@ -85,11 +59,6 @@
+ Axis limits and direction
+ ^^^^^^^^^^^^^^^^^^^^^^^^^
+ 
+-.. autosummary::
+-   :toctree: ../../_as_gen
+-   :template: autosummary.rst
+-   :nosignatures:
+-
+    get_zaxis
+    get_xlim
+    get_ylim
+@@ -105,11 +74,6 @@
+ Axis labels and title
+ ^^^^^^^^^^^^^^^^^^^^^
+ 
+-.. autosummary::
+-   :toctree: ../../_as_gen
+-   :template: autosummary.rst
+-   :nosignatures:
+-
+    set_zlabel
+    get_zlabel
+    set_title
+@@ -118,11 +82,6 @@
+ Axis scales
+ ^^^^^^^^^^^
+ 
+-.. autosummary::
+-   :toctree: ../../_as_gen
+-   :template: autosummary.rst
+-   :nosignatures:
+-
+    set_xscale
+    set_yscale
+    set_zscale
+@@ -132,11 +91,6 @@
+ Autoscaling and margins
+ ^^^^^^^^^^^^^^^^^^^^^^^
+ 
+-.. autosummary::
+-   :toctree: ../../_as_gen
+-   :template: autosummary.rst
+-   :nosignatures:
+-
+    set_zmargin
+    margins
+    autoscale
+@@ -149,11 +103,6 @@
+ Aspect ratio
+ ^^^^^^^^^^^^
+ 
+-.. autosummary::
+-   :toctree: ../../_as_gen
+-   :template: autosummary.rst
+-   :nosignatures:
+-
+    set_aspect
+    set_box_aspect
+    apply_aspect
+@@ -162,11 +111,6 @@
+ Ticks
+ ^^^^^
+ 
+-.. autosummary::
+-   :toctree: ../../_as_gen
+-   :template: autosummary.rst
+-   :nosignatures:
+-
+    tick_params
+    set_zticks
+    get_zticks
+@@ -181,33 +125,18 @@
+ Units
+ -----
+ 
+-.. autosummary::
+-   :toctree: ../../_as_gen
+-   :template: autosummary.rst
+-   :nosignatures:
+-
+    convert_zunits
+ 
+ 
+ Adding artists
+ --------------
+ 
+-.. autosummary::
+-   :toctree: ../../_as_gen
+-   :template: autosummary.rst
+-   :nosignatures:
+-
+    add_collection3d
+ 
+ 
+ Sharing
+ -------
+ 
+-.. autosummary::
+-   :toctree: ../../_as_gen
+-   :template: autosummary.rst
+-   :nosignatures:
+-
+    sharez
+    shareview
+ 
+@@ -215,11 +144,6 @@
+ Interactive
+ -----------
+ 
+-.. autosummary::
+-   :toctree: ../../_as_gen
+-   :template: autosummary.rst
+-   :nosignatures:
+-
+    can_zoom
+    can_pan
+    disable_mouse_rotation
+@@ -232,11 +156,6 @@
+ Projection and perspective
+ --------------------------
+ 
+-.. autosummary::
+-   :toctree: ../../_as_gen
+-   :template: autosummary.rst
+-   :nosignatures:
+-
+    view_init
+    set_proj_type
+    get_proj
+@@ -246,11 +165,6 @@
+ Drawing
+ -------
+ 
+-.. autosummary::
+-   :toctree: ../../_as_gen
+-   :template: autosummary.rst
+-   :nosignatures:
+-
+    draw
+    get_tightbbox
+ 
+@@ -258,11 +172,6 @@
+ Aliases and deprecated methods
+ ------------------------------
+ 
+-.. autosummary::
+-   :toctree: ../../_as_gen
+-   :template: autosummary.rst
+-   :nosignatures:
+-
+     set_zlim3d
+     stem3D
+     text3D
+@@ -274,11 +183,6 @@
+ Other
+ -----
+ 
+-.. autosummary::
+-   :toctree: ../../_as_gen
+-   :template: autosummary.rst
+-   :nosignatures:
+-
+    get_axis_position
+    add_contour_set
+    add_contourf_set
+@@ -290,11 +194,6 @@
+ Sample 3D data
+ --------------
+ 
+-.. autosummary::
+-   :toctree: ../../_as_gen
+-   :template: autosummary.rst
+-   :nosignatures:
+-
+    axes3d.get_test_data
+ 
+ 

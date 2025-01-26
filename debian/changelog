@@ -1,8 +1,55 @@
-matplotlib (3.6.3-2deepin0) unstable; urgency=medium
+matplotlib (3.8.3-3) unstable; urgency=medium
 
-  * No source change upload against GCC 12.
+  * Teamp Upload.
+  * Release to unstable.
 
- -- Tianyu Chen <sweetyfish@deepin.org>  Fri, 20 Sep 2024 12:13:28 +0800
+ -- Alexandre Detiste <tchet@debian.org>  Mon, 22 Jul 2024 10:30:19 +0200
+
+matplotlib (3.8.3-2~exp1) experimental; urgency=medium
+
+  * Team upload.
+  * Reinstate python-matplotlib-doc
+    - Build-Depends-Indep: python3-ipykernel, python3-sphinx-design,
+      python3-yaml <!nodoc>
+    - clean doc/build and doc/fontlist-v*.json
+  * debian patch manage_docs.patch enables a successful doc build
+    - skip 3d and Axes gallery examples (can't import new mpl_toolkits
+      successfully when system package of old version is installed,
+      see Bug#1074159)
+    - deactivate copyfile_regex (not available in sphinx_gallery)
+    - theme-switcher, version-switcher are not available
+    - add missing README files
+  * update debian/clean to remove generated files. Closes: #1047769.
+  * skip build tests if nocheck is set in DEB_BUILD_OPTIONS
+
+ -- Drew Parsons <dparsons@debian.org>  Mon, 24 Jun 2024 17:59:57 +0200
+
+matplotlib (3.8.3-1) experimental; urgency=medium
+
+  [ Alexandre Detiste ]
+  * adopt package (Closes: #1065325)
+  * New upstream version 3.8.3
+  * fix syntax error in Maintainer: field
+  * remove old Py2+3 boilerplate
+  * refresh patches
+  * remove one patch applied upstream
+
+  [ cielavenir ]
+  * use README.md instead of README.rst
+  * Fix 70_bts720549_try_StayPuft_for_xkcd.patch
+  * Fix 0008-Increase-test-tollerance.patch
+
+  [ Nilesh Patra ]
+  * Fully migrate to DH 13
+  * Add install file for python3-matplotlib
+  * Install README.md as docs
+  * Add d/clean
+  * Add myself to uploaders
+  * Fixup with cme
+  * Add builddep on pybind11
+  * d/rules: Build --with python3,numpy3
+
+ -- Nilesh Patra <nilesh@debian.org>  Sun, 16 Jun 2024 22:21:27 +0530
 
 matplotlib (3.6.3-2) unstable; urgency=medium
 
