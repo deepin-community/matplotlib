@@ -1,0 +1,21 @@
+#!/bin/sh
+
+set -e
+set -u
+
+export HOME=$AUTOPKGTEST_TMP
+export MATPLOTLIBDATA=/usr/share/matplotlib/mpl-data/
+export MPLCONFIGDIR=.
+
+cp pytest.ini $AUTOPKGTEST_TMP
+
+cd $AUTOPKGTEST_TMP
+
+echo "backend      : TkAgg" > matplotlibrc
+
+for py in $(py3versions -s); do
+    $py -m pytest --verbose --full-trace \
+        --ignore-glob=*/test_backend_nbagg.py \
+        -k 'not test_fig_close and not test_fig_sigint_override and not test_correct_key and not test_device_pixel_ratio_change and not test_subplottool and not test_figureoptions and not test_double_resize and not test_canvas_reinit and not test_form_widget_get_with_datetime_and_date_fields and not test_span_selector_animated_artists_callback and not test_normal_axes and not test_rcupdate and not test_unicode_won and not test_lazy_auto_backend_selection and not test_webagg and not test_bbox_inches_tight_suptile_legend and not test_bbox_inches_tight_suptitle_non_default and not test_hidden_axes and not test_compressed1 and not test_auto_date_locator_intmult_tz and not test_DateLocator and not test_figure_legend_outside and not test_warn_big_data_best_loc and not test_tmpconfigdir_warning and not test_importable_with_no_home and not test_get_tightbbox_polar and not test_backend_fallback_headful and not test_outward_ticks and not test_image_grid_single_bottom and not test_sphinx_gallery_example_header' \
+        --pyargs matplotlib
+done

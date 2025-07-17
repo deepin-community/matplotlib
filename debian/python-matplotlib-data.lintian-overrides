@@ -1,2 +1,2 @@
-font-in-non-font-package
-copyright-should-refer-to-common-license-file-for-lgpl
+# Ignore module data
+python-matplotlib-data: package-contains-documentation-outside-usr-share-doc [usr/share/matplotlib/mpl-data/*

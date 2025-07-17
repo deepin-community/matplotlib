@@ -2,28 +2,8 @@
 
 #define NO_IMPORT_ARRAY
 
+#include <Python.h>
 #include "_backend_agg.h"
-#include "mplutils.h"
-
-void BufferRegion::to_string_argb(uint8_t *buf)
-{
-    unsigned char *pix;
-    unsigned char tmp;
-    size_t i, j;
-
-    memcpy(buf, data, height * stride);
-
-    for (i = 0; i < (size_t)height; ++i) {
-        pix = buf + i * stride;
-        for (j = 0; j < (size_t)width; ++j) {
-            // Convert rgba to argb
-            tmp = pix[2];
-            pix[2] = pix[0];
-            pix[0] = tmp;
-            pix += 4;
-        }
-    }
-}
 
 RendererAgg::RendererAgg(unsigned int width, unsigned int height, double dpi)
     : width(width),
@@ -49,6 +29,16 @@ RendererAgg::RendererAgg(unsigned int width, unsigned int height, double dpi)
       lastclippath(NULL),
       _fill_color(agg::rgba(1, 1, 1, 0))
 {
+    if (dpi <= 0.0) {
+        throw std::range_error("dpi must be positive");
+    }
+
+    if (width >= 1 << 23 || height >= 1 << 23) {
+        throw std::range_error(
+            "Image size of " + std::to_string(width) + "x" + std::to_string(height) +
+            " pixels is too large. It must be less than 2^23 in each direction.");
+    }
+
     unsigned stride(width * 4);
 
     pixBuffer = new agg::int8u[NUMBYTES];
@@ -128,11 +118,11 @@ RendererAgg::restore_region(BufferRegion &region, int xx1, int yy1, int xx2, int
     rendererBase.copy_from(rbuf, &rect, x, y);
 }
 
-bool RendererAgg::render_clippath(py::PathIterator &clippath,
+bool RendererAgg::render_clippath(mpl::PathIterator &clippath,
                                   const agg::trans_affine &clippath_trans,
                                   e_snap_mode snap_mode)
 {
-    typedef agg::conv_transform<py::PathIterator> transformed_path_t;
+    typedef agg::conv_transform<mpl::PathIterator> transformed_path_t;
     typedef PathNanRemover<transformed_path_t> nan_removed_t;
     /* Unlike normal Paths, the clip path cannot be clipped to the Figure bbox,
      * because it needs to remain a complete closed path, so there is no

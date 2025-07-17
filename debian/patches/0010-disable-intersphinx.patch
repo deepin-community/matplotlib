@@ -8,8 +8,8 @@ Subject: disable intersphinx
 
 --- a/doc/conf.py
 +++ b/doc/conf.py
-@@ -144,17 +144,6 @@ missing_references_write_json = False
- missing_references_warn_unused_ignores = False
+@@ -257,19 +257,6 @@
+ 
  
  intersphinx_mapping = {
 -    'Pillow': ('https://pillow.readthedocs.io/en/stable/', None),
@@ -23,6 +23,8 @@ Subject: disable intersphinx
 -    'scipy': ('https://docs.scipy.org/doc/scipy/', None),
 -    'tornado': ('https://www.tornadoweb.org/en/stable/', None),
 -    'xarray': ('https://docs.xarray.dev/en/stable/', None),
+-    'meson-python': ('https://mesonbuild.com/meson-python/', None),
+-    'pip': ('https://pip.pypa.io/en/stable/', None),
  }
  
  

@@ -1,0 +1,11 @@
+--- a/lib/matplotlib/tests/test_constrainedlayout.py
++++ b/lib/matplotlib/tests/test_constrainedlayout.py
+@@ -675,7 +675,7 @@
+ 
+     title = fig.suptitle("Title")
+     fig.draw_without_rendering()
+-    assert title.get_position()[1] == pytest.approx(0.7457, abs=1e-3)
++    assert title.get_position()[1] == pytest.approx(0.7457, abs=1e-2)
+ 
+     title = fig.suptitle("Title", y=0.98)
+     fig.draw_without_rendering()

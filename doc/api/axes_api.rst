@@ -2,6 +2,10 @@
 ``matplotlib.axes``
 *******************
 
+The `~.axes.Axes` class represents one (sub-)plot in a figure. It contains the
+plotted data, axis ticks, labels, title, legend, etc. Its methods are the main
+interface for manipulating the plot.
+
 .. currentmodule:: matplotlib.axes
 
 .. contents:: Table of Contents
@@ -14,30 +18,26 @@
    :no-members:
    :no-undoc-members:
 
-Inheritance
-===========
-.. inheritance-diagram:: matplotlib.axes.Axes
-   :private-bases:
-
 The Axes class
 ==============
 
-.. autoclass:: Axes
-   :no-members:
-   :no-undoc-members:
-   :show-inheritance:
+.. autosummary::
+   :toctree: _as_gen
+   :template: autosummary_class_only.rst
+   :nosignatures:
 
+   Axes
 
-Subplots
-========
+Attributes
+----------
 
 .. autosummary::
    :toctree: _as_gen
    :template: autosummary.rst
    :nosignatures:
 
-   SubplotBase
-   subplot_class_factory
+   Axes.viewLim
+   Axes.dataLim
 
 Plotting
 ========
@@ -121,11 +121,12 @@ Statistics
    :template: autosummary.rst
    :nosignatures:
 
+   Axes.ecdf
    Axes.boxplot
    Axes.violinplot
 
-   Axes.violin
    Axes.bxp
+   Axes.violin
 
 Binned
 ------
@@ -261,6 +262,7 @@ Property cycle
 
    Axes.set_prop_cycle
 
+.. _axes-api-axis:
 
 Axis / limits
 =============
@@ -268,11 +270,16 @@ Axis / limits
 .. For families of methods of the form {get,set}_{x,y}foo, try to list them in
    the order set_xfoo, get_xfoo, set_yfoo, get_yfoo
 
+Axis access
+-----------
+
 .. autosummary::
    :toctree: _as_gen
    :template: autosummary.rst
    :nosignatures:
 
+   Axes.xaxis
+   Axes.yaxis
    Axes.get_xaxis
    Axes.get_yaxis
 
@@ -313,6 +320,7 @@ Axis labels, title, and legend
    Axes.get_xlabel
    Axes.set_ylabel
    Axes.get_ylabel
+   Axes.label_outer
 
    Axes.set_title
    Axes.get_title
@@ -344,6 +352,8 @@ Autoscaling and margins
    Axes.use_sticky_edges
 
    Axes.margins
+   Axes.get_xmargin
+   Axes.get_ymargin
    Axes.set_xmargin
    Axes.set_ymargin
 
@@ -484,6 +494,9 @@ Axes position
    Axes.get_axes_locator
    Axes.set_axes_locator
 
+   Axes.get_subplotspec
+   Axes.set_subplotspec
+
    Axes.reset_position
 
    Axes.get_position
@@ -520,6 +533,9 @@ Interactive
    Axes.set_navigate
    Axes.get_navigate_mode
    Axes.set_navigate_mode
+
+   Axes.get_forward_navigation_events
+   Axes.set_forward_navigation_events
 
    Axes.start_pan
    Axes.drag_pan
@@ -563,7 +579,6 @@ Drawing
    Axes.draw
    Axes.draw_artist
    Axes.redraw_in_frame
-   Axes.get_renderer_cache
 
    Axes.get_rasterization_zorder
    Axes.set_rasterization_zorder
@@ -607,5 +622,6 @@ Other
    Axes.get_transformed_clip_path_and_affine
    Axes.has_data
    Axes.set
+   Axes.remove
 
 .. autoclass:: matplotlib.axes.Axes.ArtistList

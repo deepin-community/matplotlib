@@ -1,8 +1,163 @@
-matplotlib (3.6.3-2deepin0) unstable; urgency=medium
+matplotlib (3.10.1+dfsg1-4) unstable; urgency=medium
 
-  * No source change upload against GCC 12.
+  [ Dylan Aïssi ]
+  * Team upload.
+  * Add pkgconf in Build-Deps, meson requires it to detect freetype2.
 
- -- Tianyu Chen <sweetyfish@deepin.org>  Fri, 20 Sep 2024 12:13:28 +0800
+  [ Nilesh Patra ]
+  * Add patch to fix FTBFS (Closes: #1106427)
+
+ -- Nilesh Patra <nilesh@debian.org>  Sat, 31 May 2025 22:52:08 +0530
+
+matplotlib (3.10.1+dfsg1-3) unstable; urgency=medium
+
+  [ James Addison ]
+  * Properly detect python3-gi absence/presence (Closes: #1101565)
+
+ -- Alexandre Detiste <tchet@debian.org>  Sat, 19 Apr 2025 17:28:04 +0200
+
+matplotlib (3.10.1+dfsg1-2) unstable; urgency=medium
+
+  * Release to unstable
+
+ -- Alexandre Detiste <tchet@debian.org>  Wed, 26 Mar 2025 09:38:56 +0100
+
+matplotlib (3.10.1+dfsg1-1) experimental; urgency=medium
+
+  * New upstream version 3.10.1+dfsg1 (Refresh patches)
+  * Do not force tkagg backend, the detection logic
+    has improved a lot as pointer by upstream
+  * Backport upstream commit to fix auto-backend detection case-sensitivity
+
+ -- Nilesh Patra <nilesh@debian.org>  Sun, 16 Mar 2025 19:33:32 +0530
+
+matplotlib (3.10.0+dfsg1-1~exp2) experimental; urgency=medium
+
+  * Add patch to not install pfb (missed patch in previous upload)
+
+ -- Nilesh Patra <nilesh@debian.org>  Sun, 23 Feb 2025 19:12:55 +0530
+
+matplotlib (3.10.0+dfsg1-1~exp1) experimental; urgency=medium
+
+  * New upstream version 3.10.0
+  * d/copyright: Re-pack non-free .pfb files
+  * d/patches:
+    + Refresh patches
+    + Reduce precision for test_compressed_suptitle
+    + Add patch to drop sphinx exts (not packaged in debian yet)
+  * d/clean: Cleanup matplotlibrc
+  * d/control: Update new Build-Deps
+  * d/rules:
+    - Prune mplsetup.cfg (removed 3.9.0 release) and use meson opts
+    - Skip couple of failing tests
+
+ -- Nilesh Patra <nilesh@debian.org>  Sun, 23 Feb 2025 18:25:55 +0530
+
+matplotlib (3.8.3-7) unstable; urgency=medium
+
+  * Also skip autopkgtests *sigh*
+
+ -- Nilesh Patra <nilesh@debian.org>  Sun, 23 Feb 2025 16:47:22 +0530
+
+matplotlib (3.8.3-6) unstable; urgency=medium
+
+  * Ignore more tests failing on 32-bit. Ignore arch-tests again for now
+
+ -- Nilesh Patra <nilesh@debian.org>  Sun, 23 Feb 2025 16:07:59 +0530
+
+matplotlib (3.8.3-5) unstable; urgency=medium
+
+  * Skip more tests (works locally but not on buildd)
+
+ -- Nilesh Patra <nilesh@debian.org>  Sun, 23 Feb 2025 15:38:21 +0530
+
+matplotlib (3.8.3-4) unstable; urgency=medium
+
+  [ Alexandre Detiste ]
+  * Rebuild with fixed pydata-sphinx-theme (Addresses: #1085259)
+  * Remove dependency on python3-pkg-resources (Closes: #1083475)
+  * Remove dependency on python3-sphinx-panels (Addresses: #1065029)
+  * Add gir1.2-gtk-4.0 to suggests (Closes: #1078759)
+  * Apply Multi-Arch hint
+  * Set Rules-Requires-Root: no
+  * d/copyright:
+    * vendored py2/3 dateutil is gone
+    * vendored jquery is gone
+    * Lintian cannot understand "same as upstream", assign a codename
+  * d/watch: use v4
+  * more lintian fixes:
+    * package-contains-vcs-control-file
+    * package-contains-eslint-config-file
+    * renamed-tag
+    * trailing-whitespace
+    * unused-override
+
+  [ Stuart Prescott ]
+  * Remove build-dependency on pandas and xarray for build-time tests,
+    running tests on CI instead.
+  * Add patch to fix documentation build failure with numpy 2.x (Closes:
+    #1095355 ).
+  * Fix d/rules to actually run tests on buildd.
+  * Skip all tests currently failing on buildd; this should be reverted
+    in a future upload.
+  * Run tests in parallel on buildd.
+  * Silence lots of lintian complaints on test data.
+  * Update Standards-Version to 4.7.0 (no changes required).
+
+ -- Alexandre Detiste <tchet@debian.org>  Sun, 10 Nov 2024 13:32:38 +0100
+
+matplotlib (3.8.3-3) unstable; urgency=medium
+
+  * Team Upload.
+  * Release to unstable.
+
+ -- Alexandre Detiste <tchet@debian.org>  Mon, 22 Jul 2024 10:30:19 +0200
+
+matplotlib (3.8.3-2~exp1) experimental; urgency=medium
+
+  * Team upload.
+  * Reinstate python-matplotlib-doc
+    - Build-Depends-Indep: python3-ipykernel, python3-sphinx-design,
+      python3-yaml <!nodoc>
+    - clean doc/build and doc/fontlist-v*.json
+  * debian patch manage_docs.patch enables a successful doc build
+    - skip 3d and Axes gallery examples (can't import new mpl_toolkits
+      successfully when system package of old version is installed,
+      see Bug#1074159)
+    - deactivate copyfile_regex (not available in sphinx_gallery)
+    - theme-switcher, version-switcher are not available
+    - add missing README files
+  * update debian/clean to remove generated files. Closes: #1047769.
+  * skip build tests if nocheck is set in DEB_BUILD_OPTIONS
+
+ -- Drew Parsons <dparsons@debian.org>  Mon, 24 Jun 2024 17:59:57 +0200
+
+matplotlib (3.8.3-1) experimental; urgency=medium
+
+  [ Alexandre Detiste ]
+  * adopt package (Closes: #1065325)
+  * New upstream version 3.8.3
+  * fix syntax error in Maintainer: field
+  * remove old Py2+3 boilerplate
+  * refresh patches
+  * remove one patch applied upstream
+
+  [ cielavenir ]
+  * use README.md instead of README.rst
+  * Fix 70_bts720549_try_StayPuft_for_xkcd.patch
+  * Fix 0008-Increase-test-tollerance.patch
+
+  [ Nilesh Patra ]
+  * Fully migrate to DH 13
+  * Add install file for python3-matplotlib
+  * Install README.md as docs
+  * Add d/clean
+  * Add myself to uploaders
+  * Fixup with cme
+  * Add builddep on pybind11
+  * d/rules: Build --with python3,numpy3
+
+ -- Nilesh Patra <nilesh@debian.org>  Sun, 16 Jun 2024 22:21:27 +0530
 
 matplotlib (3.6.3-2) unstable; urgency=medium
 
@@ -1998,4 +2153,3 @@ python-matplotlib (0.50-1) unstable; urgency=low
   * Initial Release.
 
  -- Vittorio Palmisano <redclay@email.it>  Sat, 21 Feb 2004 23:52:10 +0100
-
