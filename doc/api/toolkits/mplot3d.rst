@@ -12,7 +12,7 @@ and feel as regular 2D plots.  Not the fastest or most feature complete 3D
 library out there, but it ships with Matplotlib and thus may be a lighter
 weight solution for some use cases.
 
-See the :doc:`mplot3d tutorial </tutorials/toolkits/mplot3d>` for
+See the :ref:`mplot3d tutorial <mplot3d>` for
 more information.
 
 .. image:: /_static/demo_mplot3d.png
@@ -29,6 +29,7 @@ the toolbar pan and zoom buttons are not used.
 
    mplot3d/faq.rst
    mplot3d/view_angles.rst
+   mplot3d/axes3d.rst
 
 .. note::
    `.pyplot` cannot be used to add content to 3D plots, because its function
@@ -51,11 +52,8 @@ the toolbar pan and zoom buttons are not used.
    Please report any functions that do not behave as expected as a bug.
    In addition, help and patches would be greatly appreciated!
 
-.. autosummary::
-   :toctree: ../_as_gen
-   :template: autosummary.rst
 
-   axes3d.Axes3D
+`axes3d.Axes3D` (fig[, rect, elev, azim, roll, ...])    3D Axes object.
 
 
 .. module:: mpl_toolkits.mplot3d.axis3d
@@ -120,12 +118,6 @@ the toolbar pan and zoom buttons are not used.
    :template: autosummary.rst
 
    proj3d.inv_transform
-   proj3d.persp_transformation
-   proj3d.proj_points
-   proj3d.proj_trans_points
    proj3d.proj_transform
    proj3d.proj_transform_clip
-   proj3d.rot_x
-   proj3d.transform
-   proj3d.view_transformation
    proj3d.world_transformation

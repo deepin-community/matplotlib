@@ -162,7 +162,7 @@ implement a ``convert`` method that not only accepted instances of the unit,
 but also unitless values (which are passed through as is). This is no longer
 the case (``convert`` is never called with a unitless value), and such support
 in `.StrCategoryConverter` is deprecated. Likewise, the
-`.ConversionInterface.is_numlike` helper is deprecated.
+``.ConversionInterface.is_numlike`` helper is deprecated.
 
 Consider calling `.Axis.convert_units` instead, which still supports unitless
 values.
@@ -353,7 +353,7 @@ is thus deprecated as well.
 To test an installed copy, be sure to specify both ``matplotlib`` and
 ``mpl_toolkits`` with ``--pyargs``::
 
-    python -m pytest --pyargs matplotlib.tests mpl_toolkits.tests
+    pytest --pyargs matplotlib.tests mpl_toolkits.tests
 
 See :ref:`testing` for more details.
 

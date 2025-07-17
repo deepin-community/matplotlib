@@ -1,0 +1,11 @@
+--- a/lib/matplotlib/tests/meson.build
++++ b/lib/matplotlib/tests/meson.build
+@@ -99,8 +99,6 @@
+ 
+ install_data(
+   'README',
+-  'Courier10PitchBT-Bold.pfb',
+-  'cmr10.pfb',
+   'mpltest.ttf',
+   'test_nbagg_01.ipynb',
+   'test_inline_01.ipynb',

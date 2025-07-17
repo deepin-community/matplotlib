@@ -1,0 +1,11 @@
+--- a/galleries/examples/units/radian_demo.py
++++ b/galleries/examples/units/radian_demo.py
+@@ -19,7 +19,7 @@
+ import matplotlib.pyplot as plt
+ import numpy as np
+ 
+-x = [val*radians for val in np.arange(0, 15, 0.01)]
++x = [radians * val for val in np.arange(0, 15, 0.01)]
+ 
+ fig, axs = plt.subplots(2)
+ 

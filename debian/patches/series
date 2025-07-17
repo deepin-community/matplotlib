@@ -3,7 +3,13 @@
 0008-Increase-test-tollerance.patch
 0010-disable-intersphinx.patch
 0012-dont-generate-a-test-failure-if-images-are-not-close.patch
-#0013-static-SHA.patch
 0014-py3k-sphinx.patch
 0015-disable-sphinx--W.patch
-PR24862.patch
+0016-numpy2-units-fail.patch
+manage_docs.patch
+fix-test_compressed_suptitle.patch
+drop-sphinx-unpackaged-exts.patch
+do-not-install-pfb.patch
+fix-auto-backend-case-sensitivity.patch
+fix-gi-import-empty-module.patch
+fix-doc-build-basic-units.patch

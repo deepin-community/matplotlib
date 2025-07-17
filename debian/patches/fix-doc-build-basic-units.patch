@@ -1,0 +1,14 @@
+Description: Add check if self.value if iterable in basic_units example
+Author: Nilesh Patra <nilesh@debian.org>
+Last-Update: 2025-05-31
+--- a/galleries/examples/units/basic_units.py
++++ b/galleries/examples/units/basic_units.py
+@@ -170,6 +170,8 @@
+         # Return a generator expression rather than use `yield`, so that
+         # TypeError is raised by iter(self) if appropriate when checking for
+         # iterability.
++        if not hasattr(self.value, '__iter__'):
++            raise TypeError(f"Object of type {type(self.value).__name__} is not iterable")
+         return (TaggedValue(inner, self.unit) for inner in self.value)
+ 
+     def get_compressed_copy(self, mask):

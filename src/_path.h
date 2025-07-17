@@ -14,17 +14,12 @@
 #include "agg_conv_curve.h"
 #include "agg_conv_stroke.h"
 #include "agg_conv_transform.h"
-#include "agg_path_storage.h"
 #include "agg_trans_affine.h"
 
 #include "path_converters.h"
 #include "_backend_agg_basic_types.h"
-#include "numpy_cpp.h"
 
-/* Compatibility for PyPy3.7 before 7.3.4. */
-#ifndef Py_DTSF_ADD_DOT_0
-#define Py_DTSF_ADD_DOT_0 0x2
-#endif
+const size_t NUM_VERTICES[] = { 1, 1, 1, 2, 3 };
 
 struct XY
 {
@@ -116,7 +111,7 @@ void point_in_path_impl(PointArray &points, PathIterator &path, ResultArray &ins
     size_t i;
     bool all_done;
 
-    size_t n = points.size();
+    size_t n = safe_first_shape(points);
 
     std::vector<uint8_t> yflag0(n);
     std::vector<uint8_t> subpath_flag(n);
@@ -249,8 +244,7 @@ inline void points_in_path(PointArray &points,
     typedef agg::conv_curve<no_nans_t> curve_t;
     typedef agg::conv_contour<curve_t> contour_t;
 
-    size_t i;
-    for (i = 0; i < points.size(); ++i) {
+    for (auto i = 0; i < safe_first_shape(points); ++i) {
         result[i] = false;
     }
 
@@ -274,10 +268,11 @@ template <class PathIterator>
 inline bool point_in_path(
     double x, double y, const double r, PathIterator &path, agg::trans_affine &trans)
 {
-    npy_intp shape[] = {1, 2};
-    numpy::array_view<double, 2> points(shape);
-    points(0, 0) = x;
-    points(0, 1) = y;
+    py::ssize_t shape[] = {1, 2};
+    py::array_t<double> points_arr(shape);
+    *points_arr.mutable_data(0, 0) = x;
+    *points_arr.mutable_data(0, 1) = y;
+    auto points = points_arr.mutable_unchecked<2>();
 
     int result[1];
     result[0] = 0;
@@ -287,22 +282,23 @@ inline bool point_in_path(
     return result[0] != 0;
 }
 
-template <class PathIterator, class PointArray, class ResultArray>
-void points_on_path(PointArray &points,
-                    const double r,
-                    PathIterator &path,
-                    agg::trans_affine &trans,
-                    ResultArray result)
+template <class PathIterator>
+inline bool point_on_path(
+    double x, double y, const double r, PathIterator &path, agg::trans_affine &trans)
 {
     typedef agg::conv_transform<PathIterator> transformed_path_t;
     typedef PathNanRemover<transformed_path_t> no_nans_t;
     typedef agg::conv_curve<no_nans_t> curve_t;
     typedef agg::conv_stroke<curve_t> stroke_t;
 
-    size_t i;
-    for (i = 0; i < points.size(); ++i) {
-        result[i] = false;
-    }
+    py::ssize_t shape[] = {1, 2};
+    py::array_t<double> points_arr(shape);
+    *points_arr.mutable_data(0, 0) = x;
+    *points_arr.mutable_data(0, 1) = y;
+    auto points = points_arr.mutable_unchecked<2>();
+
+    int result[1];
+    result[0] = 0;
 
     transformed_path_t trans_path(path, trans);
     no_nans_t nan_removed_path(trans_path, true, path.has_codes());
@@ -310,22 +306,6 @@ void points_on_path(PointArray &points,
     stroke_t stroked_path(curved_path);
     stroked_path.width(r * 2.0);
     point_in_path_impl(points, stroked_path, result);
-}
-
-template <class PathIterator>
-inline bool point_on_path(
-    double x, double y, const double r, PathIterator &path, agg::trans_affine &trans)
-{
-    npy_intp shape[] = {1, 2};
-    numpy::array_view<double, 2> points(shape);
-    points(0, 0) = x;
-    points(0, 1) = y;
-
-    int result[1];
-    result[0] = 0;
-
-    points_on_path(points, r, path, trans, result);
-
     return result[0] != 0;
 }
 
@@ -398,24 +378,23 @@ void get_path_collection_extents(agg::trans_affine &master_transform,
                                  agg::trans_affine &offset_trans,
                                  extent_limits &extent)
 {
-    if (offsets.size() != 0 && offsets.dim(1) != 2) {
-        throw std::runtime_error("Offsets array must be Nx2");
+    if (offsets.size() != 0 && offsets.shape(1) != 2) {
+        throw std::runtime_error("Offsets array must have shape (N, 2)");
     }
 
-    size_t Npaths = paths.size();
-    size_t Noffsets = offsets.size();
-    size_t N = std::max(Npaths, Noffsets);
-    size_t Ntransforms = std::min(transforms.size(), N);
-    size_t i;
+    auto Npaths = paths.size();
+    auto Noffsets = safe_first_shape(offsets);
+    auto N = std::max(Npaths, Noffsets);
+    auto Ntransforms = std::min(safe_first_shape(transforms), N);
 
     agg::trans_affine trans;
 
     reset_limits(extent);
 
-    for (i = 0; i < N; ++i) {
+    for (auto i = 0; i < N; ++i) {
         typename PathGenerator::path_iterator path(paths(i % Npaths));
         if (Ntransforms) {
-            size_t ti = i % Ntransforms;
+            py::ssize_t ti = i % Ntransforms;
             trans = agg::trans_affine(transforms(ti, 0, 0),
                                       transforms(ti, 1, 0),
                                       transforms(ti, 0, 1),
@@ -449,24 +428,23 @@ void point_in_path_collection(double x,
                               bool filled,
                               std::vector<int> &result)
 {
-    size_t Npaths = paths.size();
+    auto Npaths = paths.size();
 
     if (Npaths == 0) {
         return;
     }
 
-    size_t Noffsets = offsets.size();
-    size_t N = std::max(Npaths, Noffsets);
-    size_t Ntransforms = std::min(transforms.size(), N);
-    size_t i;
+    auto Noffsets = safe_first_shape(offsets);
+    auto N = std::max(Npaths, Noffsets);
+    auto Ntransforms = std::min(safe_first_shape(transforms), N);
 
     agg::trans_affine trans;
 
-    for (i = 0; i < N; ++i) {
+    for (auto i = 0; i < N; ++i) {
         typename PathGenerator::path_iterator path = paths(i % Npaths);
 
         if (Ntransforms) {
-            size_t ti = i % Ntransforms;
+            auto ti = i % Ntransforms;
             trans = agg::trans_affine(transforms(ti, 0, 0),
                                       transforms(ti, 1, 0),
                                       transforms(ti, 0, 1),
@@ -728,11 +706,11 @@ clip_path_to_rect(PathIterator &path, agg::rect_d &rect, bool inside, std::vecto
 template <class VerticesArray, class ResultArray>
 void affine_transform_2d(VerticesArray &vertices, agg::trans_affine &trans, ResultArray &result)
 {
-    if (vertices.size() != 0 && vertices.dim(1) != 2) {
+    if (vertices.size() != 0 && vertices.shape(1) != 2) {
         throw std::runtime_error("Invalid vertices array.");
     }
 
-    size_t n = vertices.size();
+    size_t n = vertices.shape(0);
     double x;
     double y;
     double t0;
@@ -758,7 +736,7 @@ void affine_transform_2d(VerticesArray &vertices, agg::trans_affine &trans, Resu
 template <class VerticesArray, class ResultArray>
 void affine_transform_1d(VerticesArray &vertices, agg::trans_affine &trans, ResultArray &result)
 {
-    if (vertices.dim(0) != 2) {
+    if (vertices.shape(0) != 2) {
         throw std::runtime_error("Invalid vertices array.");
     }
 
@@ -795,7 +773,7 @@ int count_bboxes_overlapping_bbox(agg::rect_d &a, BBoxArray &bboxes)
         std::swap(a.y1, a.y2);
     }
 
-    size_t num_bboxes = bboxes.size();
+    size_t num_bboxes = safe_first_shape(bboxes);
     for (size_t i = 0; i < num_bboxes; ++i) {
         b = agg::rect_d(bboxes(i, 0, 0), bboxes(i, 0, 1), bboxes(i, 1, 0), bboxes(i, 1, 1));
 
@@ -875,7 +853,7 @@ inline bool segments_intersect(const double &x1,
 template <class PathIterator1, class PathIterator2>
 bool path_intersects_path(PathIterator1 &p1, PathIterator2 &p2)
 {
-    typedef PathNanRemover<py::PathIterator> no_nans_t;
+    typedef PathNanRemover<mpl::PathIterator> no_nans_t;
     typedef agg::conv_curve<no_nans_t> curve_t;
 
     if (p1.total_vertices() < 2 || p2.total_vertices() < 2) {
@@ -939,7 +917,7 @@ bool path_intersects_rectangle(PathIterator &path,
                                double rect_x2, double rect_y2,
                                bool filled)
 {
-    typedef PathNanRemover<py::PathIterator> no_nans_t;
+    typedef PathNanRemover<mpl::PathIterator> no_nans_t;
     typedef agg::conv_curve<no_nans_t> curve_t;
 
     if (path.total_vertices() == 0) {
@@ -985,7 +963,7 @@ void convert_path_to_polygons(PathIterator &path,
                               int closed_only,
                               std::vector<Polygon> &result)
 {
-    typedef agg::conv_transform<py::PathIterator> transformed_path_t;
+    typedef agg::conv_transform<mpl::PathIterator> transformed_path_t;
     typedef PathNanRemover<transformed_path_t> nan_removal_t;
     typedef PathClipper<nan_removal_t> clipped_t;
     typedef PathSimplifier<clipped_t> simplify_t;
@@ -1025,7 +1003,7 @@ void convert_path_to_polygons(PathIterator &path,
 
 template <class VertexSource>
 void
-__cleanup_path(VertexSource &source, std::vector<double> &vertices, std::vector<npy_uint8> &codes)
+__cleanup_path(VertexSource &source, std::vector<double> &vertices, std::vector<uint8_t> &codes)
 {
     unsigned code;
     double x, y;
@@ -1033,7 +1011,7 @@ __cleanup_path(VertexSource &source, std::vector<double> &vertices, std::vector<
         code = source.vertex(&x, &y);
         vertices.push_back(x);
         vertices.push_back(y);
-        codes.push_back((npy_uint8)code);
+        codes.push_back(static_cast<uint8_t>(code));
     } while (code != agg::path_cmd_stop);
 }
 
@@ -1051,7 +1029,7 @@ void cleanup_path(PathIterator &path,
                   std::vector<double> &vertices,
                   std::vector<unsigned char> &codes)
 {
-    typedef agg::conv_transform<py::PathIterator> transformed_path_t;
+    typedef agg::conv_transform<mpl::PathIterator> transformed_path_t;
     typedef PathNanRemover<transformed_path_t> nan_removal_t;
     typedef PathClipper<nan_removal_t> clipped_t;
     typedef PathSnapper<clipped_t> snapped_t;
@@ -1208,7 +1186,7 @@ bool convert_to_string(PathIterator &path,
                        std::string& buffer)
 {
     size_t buffersize;
-    typedef agg::conv_transform<py::PathIterator> transformed_path_t;
+    typedef agg::conv_transform<mpl::PathIterator> transformed_path_t;
     typedef PathNanRemover<transformed_path_t> nan_removal_t;
     typedef PathClipper<nan_removal_t> clipped_t;
     typedef PathSimplifier<clipped_t> simplify_t;
@@ -1222,7 +1200,7 @@ bool convert_to_string(PathIterator &path,
     clipped_t clipped(nan_removed, do_clip, clip_rect);
     simplify_t simplified(clipped, simplify, path.simplify_threshold());
 
-    buffersize = path.total_vertices() * (precision + 5) * 4;
+    buffersize = (size_t) path.total_vertices() * (precision + 5) * 4;
     if (buffersize == 0) {
         return true;
     }
@@ -1244,70 +1222,26 @@ bool convert_to_string(PathIterator &path,
 }
 
 template<class T>
-struct _is_sorted
+bool is_sorted_and_has_non_nan(py::array_t<T> array)
 {
-    bool operator()(PyArrayObject *array)
-    {
-        npy_intp size;
-        npy_intp i;
-        T last_value;
-        T current_value;
+    auto size = array.shape(0);
+    using limits = std::numeric_limits<T>;
+    T last = limits::has_infinity ? -limits::infinity() : limits::min();
+    bool found_non_nan = false;
 
-        size = PyArray_DIM(array, 0);
-
-        // std::isnan is only in C++11, which we don't yet require,
-        // so we use the "self == self" trick
-        for (i = 0; i < size; ++i) {
-            last_value = *((T *)PyArray_GETPTR1(array, i));
-            if (last_value == last_value) {
-                break;
-            }
-        }
-
-        if (i == size) {
-            // The whole array is non-finite
-            return false;
-        }
-
-        for (; i < size; ++i) {
-            current_value = *((T *)PyArray_GETPTR1(array, i));
-            if (current_value == current_value) {
-                if (current_value < last_value) {
-                    return false;
-                }
-                last_value = current_value;
-            }
-        }
-
-        return true;
-    }
-};
-
-
-template<class T>
-struct _is_sorted_int
-{
-    bool operator()(PyArrayObject *array)
-    {
-        npy_intp size;
-        npy_intp i;
-        T last_value;
-        T current_value;
-
-        size = PyArray_DIM(array, 0);
-
-        last_value = *((T *)PyArray_GETPTR1(array, 0));
-
-        for (i = 1; i < size; ++i) {
-            current_value = *((T *)PyArray_GETPTR1(array, i));
-            if (current_value < last_value) {
+    for (auto i = 0; i < size; ++i) {
+        T current = *array.data(i);
+        // The following tests !isnan(current), but also works for integral
+        // types.  (The isnan(IntegralType) overload is absent on MSVC.)
+        if (current == current) {
+            found_non_nan = true;
+            if (current < last) {
                 return false;
             }
-            last_value = current_value;
+            last = current;
         }
-
-        return true;
     }
+    return found_non_nan;
 };
 
 

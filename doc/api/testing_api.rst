@@ -3,11 +3,6 @@
 **********************
 
 
-:func:`matplotlib.test`
-=======================
-
-.. autofunction:: matplotlib.test
-
 :mod:`matplotlib.testing`
 =========================
 
@@ -42,3 +37,11 @@
    :members:
    :undoc-members:
    :show-inheritance:
+
+
+Testing with optional dependencies
+==================================
+For more information on fixtures, see :external+pytest:ref:`pytest fixtures <about-fixtures>`.
+
+.. autofunction:: matplotlib.testing.conftest.pd
+.. autofunction:: matplotlib.testing.conftest.xr

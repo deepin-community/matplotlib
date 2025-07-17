@@ -3,9 +3,12 @@
 #ifndef MPL_PATH_CONVERTERS_H
 #define MPL_PATH_CONVERTERS_H
 
+#include <pybind11/pybind11.h>
+
 #include <cmath>
-#include <stdint.h>
-#include "agg_path_storage.h"
+#include <cstdint>
+#include <limits>
+
 #include "agg_clip_liang_barsky.h"
 #include "mplutils.h"
 #include "agg_conv_segmentator.h"
@@ -25,7 +28,7 @@
 
    3. PathClipper: Clips line segments to a given rectangle.  This is
       helpful for data reduction, and also to avoid a limitation in
-      Agg where coordinates can not be larger than 24-bit signed
+      Agg where coordinates cannot be larger than 24-bit signed
       integers.
 
    4. PathSnapper: Rounds the path to the nearest center-pixels.
@@ -257,7 +260,7 @@ class PathNanRemover : protected EmbeddedQueue<4>
                 m_last_segment_valid = (std::isfinite(*x) && std::isfinite(*y));
                 queue_push(code, *x, *y);
 
-                /* Note: this test can not be short-circuited, since we need to
+                /* Note: this test cannot be short-circuited, since we need to
                    advance through the entire curve no matter what */
                 for (size_t i = 0; i < num_extra_points; ++i) {
                     m_source->vertex(x, y);
@@ -529,6 +532,24 @@ enum e_snap_mode {
     SNAP_TRUE
 };
 
+namespace PYBIND11_NAMESPACE { namespace detail {
+    template <> struct type_caster<e_snap_mode> {
+    public:
+        PYBIND11_TYPE_CASTER(e_snap_mode, const_name("e_snap_mode"));
+
+        bool load(handle src, bool) {
+            if (src.is_none()) {
+                value = SNAP_AUTO;
+                return true;
+            }
+
+            value = src.cast<bool>() ? SNAP_TRUE : SNAP_FALSE;
+
+            return true;
+        }
+    };
+}} // namespace PYBIND11_NAMESPACE::detail
+
 template <class VertexSource>
 class PathSnapper
 {
@@ -595,7 +616,7 @@ class PathSnapper
         m_snap = should_snap(source, snap_mode, total_vertices);
 
         if (m_snap) {
-            int is_odd = (int)mpl_round(stroke_width) % 2;
+            int is_odd = mpl_round_to_int(stroke_width) % 2;
             m_snap_value = (is_odd) ? 0.5 : 0.0;
         }
 
@@ -643,6 +664,13 @@ class PathSimplifier : protected EmbeddedQueue<9>
           m_moveto(true),
           m_after_moveto(false),
           m_clipped(false),
+
+          // whether the most recent MOVETO vertex is valid
+          m_has_init(false),
+
+          // the most recent MOVETO vertex
+          m_initX(0.0),
+          m_initY(0.0),
 
           // the x, y values from last iteration
           m_lastx(0.0),
@@ -754,6 +782,15 @@ class PathSimplifier : protected EmbeddedQueue<9>
                     _push(x, y);
                 }
                 m_after_moveto = true;
+
+                if (std::isfinite(*x) && std::isfinite(*y)) {
+                    m_has_init = true;
+                    m_initX = *x;
+                    m_initY = *y;
+                } else {
+                    m_has_init = false;
+                }
+
                 m_lastx = *x;
                 m_lasty = *y;
                 m_moveto = false;
@@ -767,6 +804,19 @@ class PathSimplifier : protected EmbeddedQueue<9>
                 continue;
             }
             m_after_moveto = false;
+
+            if(agg::is_close(cmd)) {
+                if (m_has_init) {
+                    /* If we have a valid initial vertex, then
+                       replace the current vertex with the initial vertex */
+                    *x = m_initX;
+                    *y = m_initY;
+                } else {
+                    /* If we don't have a valid initial vertex, then
+                       we can't close the path, so we skip the vertex */
+                    continue;
+                }
+            }
 
             /* NOTE: We used to skip this very short segments, but if
                you have a lot of them cumulatively, you can miss
@@ -919,6 +969,8 @@ class PathSimplifier : protected EmbeddedQueue<9>
     bool m_moveto;
     bool m_after_moveto;
     bool m_clipped;
+    bool m_has_init;
+    double m_initX, m_initY;
     double m_lastx, m_lasty;
 
     double m_origdx;
@@ -1018,6 +1070,19 @@ class Sketch
           m_rand(0)
     {
         rewind(0);
+        const double d_M_PI = 3.14159265358979323846;
+        // Set derived values to zero if m_length or m_randomness are zero to
+        // avoid divide-by-zero errors when a sketch is created but not used.
+        if (m_length <= std::numeric_limits<double>::epsilon() || m_randomness <= std::numeric_limits<double>::epsilon()) {
+            m_p_scale = 0.0;
+        } else {
+            m_p_scale = (2.0 * d_M_PI) / (m_length * m_randomness);
+        }
+        if (m_randomness <= std::numeric_limits<double>::epsilon()) {
+            m_log_randomness = 0.0;
+        } else {
+            m_log_randomness = 2.0 * log(m_randomness);
+        }
     }
 
     unsigned vertex(double *x, double *y)
@@ -1037,9 +1102,20 @@ class Sketch
             // We want the "cursor" along the sine wave to move at a
             // random rate.
             double d_rand = m_rand.get_double();
-            double d_M_PI = 3.14159265358979323846;
-            m_p += pow(m_randomness, d_rand * 2.0 - 1.0);
-            double r = sin(m_p / (m_length / (d_M_PI * 2.0))) * m_scale;
+            // Original computation
+            // p += pow(k, 2*rand - 1)
+            // r = sin(p * c)
+            // x86 computes pow(a, b) as exp(b*log(a))
+            // First, move -1 out, so
+            // p' += pow(k, 2*rand)
+            // r = sin(p * c') where c' = c / k
+            // Next, use x86 logic (will not be worse on other platforms as
+            // the log is only computed once and pow and exp are, at worst,
+            // the same)
+            // So p+= exp(2*rand*log(k))
+            // lk = 2*log(k)
+            // p += exp(rand*lk)
+            m_p += exp(d_rand * m_log_randomness);
             double den = m_last_x - *x;
             double num = m_last_y - *y;
             double len = num * num + den * den;
@@ -1047,8 +1123,10 @@ class Sketch
             m_last_y = *y;
             if (len != 0) {
                 len = sqrt(len);
-                *x += r * num / len;
-                *y += r * -den / len;
+                double r = sin(m_p * m_p_scale) * m_scale;
+                double roverlen = r / len;
+                *x += roverlen * num;
+                *y -= roverlen * den;
             }
         } else {
             m_last_x = *x;
@@ -1083,6 +1161,8 @@ class Sketch
     bool m_has_last;
     double m_p;
     RandomNumberGenerator m_rand;
+    double m_p_scale;
+    double m_log_randomness;
 };
 
 #endif // MPL_PATH_CONVERTERS_H
