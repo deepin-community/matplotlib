@@ -1,3 +1,2 @@
 lib/matplotlib/mpl-data/ /usr/share/matplotlib/
-lib/matplotlib/mpl-data/matplotlibrc /usr/share/matplotlib/matplotlib.conf
 lib/matplotlib/mpl-data/matplotlibrc /etc/

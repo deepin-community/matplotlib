@@ -1,3 +1,74 @@
+matplotlib (3.10.7+dfsg1-5) unstable; urgency=medium
+
+  * Team upload.
+
+  [ Nilesh Patra ]
+  * Skip test_lockfilefailure.
+
+  [ Colin Watson ]
+  * Build-depend on xauth (closes: #1137583).
+
+ -- Colin Watson <cjwatson@debian.org>  Mon, 25 May 2026 12:37:57 +0100
+
+matplotlib (3.10.7+dfsg1-4) unstable; urgency=medium
+
+  [ Bastian Germann ]
+  * Build-Depend on xvfb (Closes: #1131963)
+  * Include only the expected modules in python3-matplotlib
+
+  [ Nilesh Patra ]
+  * Drop installation of matplotlib.conf - this was a "directory"
+    and un-used in the code
+  * Re-diff patches
+  * Skip test_norm_callback
+  * Fix pylab.py install rule
+  * Skip test_show_source_link_false
+  * Remove useless artefacts before dh_missing check
+
+ -- Nilesh Patra <nilesh@debian.org>  Sun, 10 May 2026 14:49:37 +0530
+
+matplotlib (3.10.7+dfsg1-3) unstable; urgency=medium
+
+  * Team upload
+  * Build with PyQt6
+
+ -- Bastian Germann <bage@debian.org>  Mon, 16 Mar 2026 20:53:14 +0100
+
+matplotlib (3.10.7+dfsg1-2) unstable; urgency=medium
+
+  * Team upload
+  * Mark python3-pytest-xvfb <!nocheck>
+
+  [ Alexandre Detiste ]
+  * drop obsolete lintian overrides
+  * lintian: typo in patch description
+
+ -- Bastian Germann <bage@debian.org>  Wed, 04 Feb 2026 22:27:39 +0100
+
+matplotlib (3.10.7+dfsg1-1) unstable; urgency=medium
+
+  * Team upload.
+  * New upstream version 3.10.7+dfsg1. Closes: #1118636.
+  * d/p/fix-test_compressed_suptitle.patch: dropped, addressed upstream
+  * d/p/fix-auto-backend-case-sensitivity.patch: dropped, applied upstream
+
+ -- Simon Chopin <schopin@ubuntu.com>  Thu, 23 Oct 2025 12:30:44 +0200
+
+matplotlib (3.10.1+dfsg1-6) unstable; urgency=medium
+
+  * Team upload.
+  * d/control: Drop <!nocheck> from python3-pytest-xvfb. Closes: #1116787.
+  * d/control: Drop "Rules-Requires-Root: no" (default).
+  * d/control: Update standards-version.
+
+ -- Santiago Vila <sanvila@debian.org>  Sun, 12 Oct 2025 22:45:00 +0200
+
+matplotlib (3.10.1+dfsg1-5) unstable; urgency=medium
+
+  * Remove long time unused jQuery dependencies
+
+ -- Alexandre Detiste <tchet@debian.org>  Fri, 05 Sep 2025 18:32:35 +0200
+
 matplotlib (3.10.1+dfsg1-4) unstable; urgency=medium
 
   [ Dylan Aïssi ]

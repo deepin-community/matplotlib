@@ -1,6 +1,6 @@
 From: Sandro Tosi <morph@debian.org>
 Date: Thu, 17 May 2018 20:00:17 -0400
-Subject: dont generate a test failure if images are not close to baseline
+Subject: don't generate a test failure if images are not close to baseline
 
 ---
  lib/matplotlib/testing/decorators.py | 2 +-
