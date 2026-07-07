@@ -3,7 +3,7 @@ Author: Nilesh Patra <nilesh@debian.org>
 Last-Update: 2025-05-31
 --- a/galleries/examples/units/basic_units.py
 +++ b/galleries/examples/units/basic_units.py
-@@ -170,6 +170,8 @@
+@@ -178,6 +178,8 @@
          # Return a generator expression rather than use `yield`, so that
          # TypeError is raised by iter(self) if appropriate when checking for
          # iterability.

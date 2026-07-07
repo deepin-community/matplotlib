@@ -38,13 +38,14 @@ Build-Depends:
  python3-kiwisolver,
  python3-mesonpy,
  python3-numpy,
+ python3-numpy-dev,
  python3-numpydoc,
  python3-pikepdf <!nocheck>,
  python3-pil,
  python3-pil.imagetk <!nocheck>,
  python3-pybind11,
  python3-pyparsing,
- python3-pyqt5 [!hurd-i386],
+ python3-pyqt6 [!hurd-i386],
  python3-pytest <!nocheck>,
  python3-pytest-xdist <!nocheck>,
  python3-pytest-xvfb <!nocheck>,
@@ -62,6 +63,8 @@ Build-Depends:
  texlive-science <!nocheck>,
  texlive-xetex <!nocheck>,
  tk8.6-dev,
+ xauth,
+ xvfb,
  zlib1g-dev,
 Build-Depends-Indep:
  cm-super-minimal <!nodoc>,
@@ -82,8 +85,7 @@ Build-Depends-Indep:
  python3-sphinx-gallery (>= 0.10.0) <!stage1> <!nodoc>,
  python3-sphinxcontrib.svg2pdfconverter <!nodoc>,
  python3-yaml <!nodoc>,
-Rules-Requires-Root: no
-Standards-Version: 4.7.0
+Standards-Version: 4.7.2
 Vcs-Browser: https://salsa.debian.org/python-team/packages/matplotlib
 Vcs-Git: https://salsa.debian.org/python-team/packages/matplotlib.git
 Homepage: http://matplotlib.org/
@@ -92,8 +94,6 @@ X-Style: black
 Package: python3-matplotlib
 Architecture: any
 Depends:
- libjs-jquery,
- libjs-jquery-ui,
  python-matplotlib-data (>= ${source:Upstream-Version}),
  python3-dateutil,
  python3-pil.imagetk,
@@ -120,7 +120,7 @@ Suggests:
  python3-gi,
  python3-gi-cairo,
  python3-gobject,
- python3-pyqt5,
+ python3-pyqt6,
  python3-scipy,
  python3-sip,
  python3-tornado,
@@ -156,7 +156,6 @@ Architecture: all
 Multi-Arch: foreign
 Section: doc
 Depends:
- libjs-jquery,
  ${misc:Depends},
  ${sphinxdoc:Depends},
 Build-Profiles: <!nodoc>

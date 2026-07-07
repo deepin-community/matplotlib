@@ -51,7 +51,7 @@ execute_after_dh_auto_test-arch:
 
 # the "not" tests are due to https://github.com/matplotlib/matplotlib/issues/24770
 # and 2025-01-29 attempt fix FTBFS as part of numpy2/python3.13 transitions
-override_dh_auto_test-arch: export PYBUILD_TEST_ARGS=-n $(DEB_BUILD_OPTION_PARALLEL) -v --ignore-glob=*/test_backend_nbagg.py -k 'not test_fig_close and not test_fig_sigint_override and not test_correct_key and not test_device_pixel_ratio_change and not test_subplottool and not test_figureoptions and not test_double_resize and not test_canvas_reinit and not test_form_widget_get_with_datetime_and_date_fields and not test_span_selector_animated_artists_callback and not test_normal_axes and not test_rcupdate and not test_unicode_won and not test_lazy_auto_backend_selection and not test_webagg and not test_bbox_inches_tight_suptile_legend[png] and not test_bbox_inches_tight_suptitle_non_default[png] and not test_hidden_axes and not test_compressed1 and not test_auto_date_locator_intmult_tz and not test_DateLocator and not test_figure_legend_outside and not test_warn_big_data_best_loc and not test_tmpconfigdir_warning and not test_importable_with_no_home and not test_get_tightbbox_polar and not test_backend_fallback_headful and not test_outward_ticks and not test_image_grid_single_bottom[png] and not test_sphinx_gallery_example_header and not test_interactive_backend and not test_interactive_thread_safety and not test_blitting_events and not test_sigint and not test_other_signal_before_sigint and not test_interactive_timers and not test_savefig_to_stringio and not test_psd_csd and not test_overprecision and not test_Type1Font_2 and not test_Type1Font and not test_ft2font_get_kerning and not test_ipython and not test_lazy_linux_headless and not test_determinism_check'
+override_dh_auto_test-arch: export PYBUILD_TEST_ARGS=-n $(DEB_BUILD_OPTION_PARALLEL) -v --ignore-glob=*/test_backend_nbagg.py -k 'not test_fig_close and not test_fig_sigint_override and not test_correct_key and not test_device_pixel_ratio_change and not test_subplottool and not test_figureoptions and not test_double_resize and not test_canvas_reinit and not test_form_widget_get_with_datetime_and_date_fields and not test_span_selector_animated_artists_callback and not test_normal_axes and not test_rcupdate and not test_unicode_won and not test_lazy_auto_backend_selection and not test_webagg and not test_bbox_inches_tight_suptile_legend[png] and not test_bbox_inches_tight_suptitle_non_default[png] and not test_hidden_axes and not test_compressed1 and not test_auto_date_locator_intmult_tz and not test_DateLocator and not test_figure_legend_outside and not test_warn_big_data_best_loc and not test_tmpconfigdir_warning and not test_importable_with_no_home and not test_get_tightbbox_polar and not test_backend_fallback_headful and not test_outward_ticks and not test_image_grid_single_bottom[png] and not test_sphinx_gallery_example_header and not test_interactive_backend and not test_interactive_thread_safety and not test_blitting_events and not test_sigint and not test_other_signal_before_sigint and not test_interactive_timers and not test_savefig_to_stringio and not test_psd_csd and not test_overprecision and not test_Type1Font_2 and not test_Type1Font and not test_ft2font_get_kerning and not test_ipython and not test_lazy_linux_headless and not test_determinism_check and not test_norm_callback and not test_show_source_link_false and not test_lockfilefailure'
 override_dh_auto_test-arch: export MATPLOTLIBDATA=$(CURDIR)/lib/matplotlib/mpl-data/
 override_dh_auto_test-arch: export MPLCONFIGDIR=$(CURDIR)
 override_dh_auto_test-arch:
@@ -84,17 +84,6 @@ execute_after_dh_install-arch:
 	# for CI tests
 	rm -rf $(CURDIR)/debian/$(p3)/usr/lib/python*/dist-packages/matplotlib/mpl-data/
 	rm -rf $(CURDIR)/debian/$(p3)/usr/lib/python*/dist-packages/matplotlib/backends/Matplotlib.nib/
-	rm -f $(CURDIR)/debian/$(p3)/usr/lib/python*/dist-packages/matplotlib/backends/web_backend/jquery/js/jquery-1.7.1.min.js
-	rm -f $(CURDIR)/debian/$(p3)/usr/lib/python*/dist-packages/matplotlib/backends/web_backend/jquery/js/jquery-ui.min.js
-	rm -f $(CURDIR)/debian/$(p3)/usr/lib/python*/dist-packages/matplotlib/backends/web_backend/jquery/css/themes/base/jquery-ui.min.css
 
-override_dh_link-arch:
-	# replace minified jquery with packaged version and hope it works
-	-for i in $(PY3VERS); do \
-	    dh_link -ppython3-matplotlib usr/share/javascript/jquery/jquery.min.js \
-	      usr/lib/python3/dist-packages/matplotlib/backends/web_backend/jquery/js/jquery-1.7.1.min.js; \
-	    dh_link -ppython3-matplotlib usr/share/javascript/jquery-ui/jquery-ui.min.js \
-	      usr/lib/python3/dist-packages/matplotlib/backends/web_backend/jquery/js/jquery-ui.min.js; \
-	    dh_link  -ppython3-matplotlib usr/share/javascript/jquery-ui/css/smoothness/jquery-ui.min.css \
-	      usr/lib/python3/dist-packages/matplotlib/backends/web_backend/jquery/css/themes/base/jquery-ui.min.css; \
-	done
+execute_before_dh_missing:
+	find debian/tmp -type d \( -name "result_images" -o -name ".pytest_cache" \) -exec rm -rf {} \; || true
